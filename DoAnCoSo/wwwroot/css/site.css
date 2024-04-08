@@ -1,0 +1,115 @@
+﻿html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+/* Định dạng thanh navbar */
+.navbar {
+    background-color: #f4a460; /* Màu nền */
+}
+
+.navbar-brand {
+    padding: 0; /* Loại bỏ padding của phần tử a */
+}
+
+/* Định dạng hình ảnh logo */
+.logo {
+    max-width: 100%; /* Hình ảnh không vượt quá kích thước của phần tử mẹ */
+    height: 40px; /* Chiều cao tự điều chỉnh để giữ tỷ lệ khung hình */
+    display: block; /* Hiển thị hình ảnh dưới dạng block để có thể canh chỉnh kích thước */
+}
+
+/* Định dạng ô tìm kiếm */
+.form-inline input[type="search"] {
+    width: 300px; /* Đặt chiều rộng của ô tìm kiếm */
+}
+
+/* Định dạng các liên kết trên thanh navbar */
+.navbar-nav .nav-link {
+    color: rgba(0, 0, 0, 0.7); /* Màu chữ */
+    margin-left: 20px; /* Khoảng cách giữa các liên kết */
+}
+
+    .navbar-nav .nav-link:hover {
+        color: rgba(0, 0, 0, 1); /* Màu chữ khi di chuột qua */
+    }
+/* Định dạng chung cho dropdown */
+/* Container cho dropdown */
+
+
+/* Dropdown */
+.custom-select {
+    width: 170px; /* Độ rộng của dropdown */
+    padding: 10px; /* Khoảng cách giữa viền và nội dung trong dropdown */
+    border-radius: 10px;
+    transition: box-shadow 0.3s; /* Hiệu ứng chuyển động khi hover */
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Hiệu ứng shadow mặc định */
+}
+
+    /* Dropdown options */
+    .custom-select option {
+        color: orange; /* Màu chữ */
+        background-color: white; /* Màu nền */
+        
+    }
+.custom-select-container:hover {
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3); /* Hiệu ứng shadow khi hover */
+}
+/* Dropdown màu cam */
+.dropdown-orange {
+    border-color: orange; /* Màu viền */
+    background-color: white; /* Màu nền */
+    color: orange; /* Màu chữ */
+}
+.large-input {
+    width: 1000px; /* Độ rộng mong muốn */
+    height: 150px; /* Chiều cao mong muốn */
+    padding: 10px; /* Khoảng cách giữa nội dung và viền */
+    border-radius: 15px; /* Bo tròn cạnh */
+    border: 1px solid #ccc; /* Viền */
+    font-size: 16px; /* Kích thước chữ */
+}
+/* CSS cho các nút */
+.button {
+    padding: 10px 20px; /* Kích thước và khoảng cách giữa nút */
+    border: none; /* Loại bỏ viền */
+    border-radius: 30px; /* Bo tròn góc */
+    transition: box-shadow 0.3s; /* Hiệu ứng chuyển động khi hover */
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Hiệu ứng shadow mặc định */
+    background-color: orange; /* Màu nền */
+    color: white; /* Màu chữ */
+    cursor: pointer; /* Con trỏ khi di chuột */
+    margin-right: 20px;
+}
+
+    /* Hover effect */
+    .button:hover {
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3); /* Hiệu ứng shadow khi hover */
+    }
+
+    /* Active effect */
+    .button:active {
+        transform: translateY(1px); /* Hiệu ứng nhấn xuống */
+    }
+/* CSS cho container chứa nút */
+.button-container {
+    display: flex; /* Sử dụng Flexbox */
+    justify-content: center; /* Căn giữa các phần tử theo chiều ngang */
+}
