@@ -14,13 +14,11 @@ namespace DoAnCoSoAPI.Entities
         public string? LastName { get; set; }
         [BsonElement("eMail"), BsonRepresentation(BsonType.String)]
         public string? Email { get; set; }
-        [BsonElement("passWord"), BsonRepresentation(BsonType.String)]
-        public string? Password { get; set; }
         [BsonElement("passWordHash"), BsonRepresentation(BsonType.String)]
         public string? PasswordHash { get; set; }
         [BsonElement("registerAt"), BsonRepresentation(BsonType.DateTime)]
         public DateTime? RegisterAt { get; set; }
         [BsonElement("lastLogin"), BsonRepresentation(BsonType.DateTime)]
-        public DateTime? LastLogin { get;}
+        public DateTime? LastLogin { get; set; }
     }
 }
