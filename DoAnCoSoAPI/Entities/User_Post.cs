@@ -10,9 +10,14 @@ namespace DoAnCoSoAPI.Entities
         [BsonId]
         [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
         public string? id { set; get; }
- 
-        [BsonElement("message"), BsonRepresentation(BsonType.String)]
-        public string? message { set; get; }
+        [BsonElement("title"), BsonRepresentation(BsonType.String)]
+        public string? title { set; get; }
+        [BsonElement("content"), BsonRepresentation(BsonType.String)]
+        public string? content { set; get; }
+        [BsonIgnoreIfNull]
+        [BsonElement("images")]
+        [BsonRepresentation(BsonType.Binary)]
+        public List<byte[]>? images { set; get; }
         [BsonElement("createdAt"), BsonRepresentation(BsonType.DateTime)]
         public DateTime? createdAt { set; get; }
         [BsonElement("updatedAt"), BsonRepresentation(BsonType.DateTime)]

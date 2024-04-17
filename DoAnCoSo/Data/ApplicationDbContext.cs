@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using DoAnCoSoAPI.Entities;
 
 namespace DoAnCoSo.Data
 {
@@ -9,5 +10,6 @@ namespace DoAnCoSo.Data
             : base(options)
         {
         }
+        public DbSet<DoAnCoSoAPI.Entities.User_Post> User_Post { get; set; } = default!;
     }
 }

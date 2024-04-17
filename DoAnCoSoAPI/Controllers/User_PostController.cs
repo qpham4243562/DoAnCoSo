@@ -28,12 +28,24 @@ namespace DoAnCoSoAPI.Controllers
             return user_Post is not null ? Ok(user_Post) : NotFound();
         }
         [HttpPost]
-
-        public async Task<ActionResult> Create(User_Post user_Post)
+        public async Task<ActionResult> Create([FromForm] User_Post user_Post)
         {
+            var files = HttpContext.Request.Form.Files;
+            if (files != null && files.Count > 0)
+            {
+                foreach (var file in files)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        await file.CopyToAsync(ms);
+                        user_Post.images.Add(ms.ToArray());
+                    }
+                }
+            }
             await _user_Post.InsertOneAsync(user_Post);
             return CreatedAtAction(nameof(GetById), new { id = user_Post.id }, user_Post);
         }
+
         [HttpPut]
 
         public async Task<ActionResult> Update(User_Post user_Post)
