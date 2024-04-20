@@ -6,7 +6,7 @@ using MongoDB.Driver;
 
 namespace DoAnCoSoAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class User_PostController : ControllerBase
     {
@@ -31,18 +31,26 @@ namespace DoAnCoSoAPI.Controllers
         public async Task<ActionResult> Create([FromForm] User_Post user_Post)
         {
             var files = HttpContext.Request.Form.Files;
-            if (files != null && files.Count > 0)
+
+            // Handle multiple images efficiently (up to a reasonable limit)
+            if (files != null)
             {
-                foreach (var file in files)
+                var imageCount = Math.Min(files.Count, 10); // Limit to 10 images (adjust as needed)
+
+                user_Post.images = new List<byte[]>(imageCount);
+                for (int i = 0; i < imageCount; i++)
                 {
                     using (var ms = new MemoryStream())
                     {
-                        await file.CopyToAsync(ms);
+                        await files[i].CopyToAsync(ms);
                         user_Post.images.Add(ms.ToArray());
                     }
                 }
             }
+
+            // Insert data with images
             await _user_Post.InsertOneAsync(user_Post);
+
             return CreatedAtAction(nameof(GetById), new { id = user_Post.id }, user_Post);
         }
 
