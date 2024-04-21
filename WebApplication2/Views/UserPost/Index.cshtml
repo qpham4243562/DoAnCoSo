@@ -3,33 +3,63 @@
 @{
     ViewData["Title"] = "Index";
 }
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-<table class="table">
+<div class="container mt-4">
+    <div class="row">
+        <div class="col">
+            <div class="custom-select-container">
+                <form class="form-inline mb-3">
+                    <select class="custom-select mr-sm-2 dropdown-orange">
+                        <option selected>Chọn khối</option>
+                        <option value="1">Khối 1</option>
+                        <option value="2">Khối 2</option>
+                        <option value="3">Khối 3</option>
+                        <!-- Thêm các tùy chọn khác nếu cần -->
+                    </select>
+                    <select class="custom-select mr-sm-2 dropdown-orange">
+                        <option selected>Chọn môn học</option>
+                        <option value="1">Toán</option>
+                        <option value="2">Văn</option>
+                        <option value="3">Anh</option>
+                        <!-- Thêm các tùy chọn khác nếu cần -->
+                    </select>
+                </form>
+                <div class="d-flex align-items-center mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16" style="color:orange; padding: 10px 10px 10px 10px">
+                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+                    </svg>
+                    <form class="form-inline ml-2">
+                        <input type="text" placeholder="Nhập văn bản vào đây..." class="large-input">
+                    </form>
+                </div>
+                <div class="button-container">
+                    <a id="createQuestionButton" asp-controller="UserPost" asp-action="Create" class="button">Tạo câu hỏi</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<table class="table table-warning table-striped table-bordered">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.id)
+                ID bài đăng
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.title)
+                Chủ đề
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.content)
+                Nội dung
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.createdAt)
+                Ngày tạo
             </th>
+@*             <th>
+                Cập nhật tại
+            </th> *@
             <th>
-                @Html.DisplayNameFor(model => model.updatedAt)
+                Hình ảnh
             </th>
-            <th>
-                Images
-            </th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -48,9 +78,9 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.createdAt)
                 </td>
-                <td>
+@*                 <td>
                     @Html.DisplayFor(modelItem => item.updatedAt)
-                </td>
+                </td> *@
                 <td>
                     @if (item.images != null && item.images.Any())
                     {
