@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Index";
 }
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <div class="container mt-4">
     <div class="row">
         <div class="col">
@@ -38,59 +39,96 @@
             </div>
         </div>
     </div>
-</div>
-<table class="table table-warning table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>
-                ID bài đăng
-            </th>
-            <th>
-                Chủ đề
-            </th>
-            <th>
-                Nội dung
-            </th>
-            <th>
-                Ngày tạo
-            </th>
-@*             <th>
-                Cập nhật tại
-            </th> *@
-            <th>
-                Hình ảnh
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+    <table class="table table-warning table-striped table-bordered">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.content)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.createdAt)
-                </td>
-@*                 <td>
-                    @Html.DisplayFor(modelItem => item.updatedAt)
-                </td> *@
-                <td>
-                    @if (item.images != null && item.images.Any())
-                    {
-                        foreach (var image in item.images)
-                        {
-                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(image)" alt="Post Image" style="max-width: 100px; max-height: 100px;" />
-                        }
-                    }
-                </td>
+                <th>
+                    Tên người tạo
+                </th>
+                <th>
+                    ID bài đăng
+                </th>
+                <th>
+                    Chủ đề
+                </th>
+                <th>
+                    Nội dung
+                </th>
+                <th>
+                    Ngày tạo
+                </th>
+                @*             <th>
+                Cập nhật tại
+                </th> *@
+                <th>
+                    Hình ảnh
+                </th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatorName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.content)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.createdAt)
+                    </td>
+                    @*                 <td>
+                @Html.DisplayFor(modelItem => item.updatedAt)
+                </td> *@
+                    <td>
+                        @if (item.images != null && item.images.Any())
+                        {
+                            foreach (var image in item.images)
+                            {
+                                <img src="data:image/jpeg;base64,@Convert.ToBase64String(image)" alt="Post Image" style="max-width: 100px; max-height: 100px;" />
+                            }
+                        }
+                    </td>
+                    <td>
+                        <div id="likes-count-@item.id">@item.Likes</div>
+                    </td>
+                    <td>
+                        <button class="like-btn" data-postid="@item.id">Like</button>
+                    </td>
+
+                    <td>
+                        @Html.ActionLink("Update", "Update", new { id = item.id }) |
+
+                        @Html.ActionLink("Delete", "Delete", new { id = item.id })
+                    </td>
+
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script>
+    $(".like-btn").click(function () {
+        var postid = $(this).data("postid");
+        var likeCount = $("#likes-count-" + postid);
+
+        $.ajax({
+            type: "POST",
+            url: "/like/" + postid,
+            success: function (data) {
+                likeCount.text(data.likes);
+            },
+            error: function () {
+                alert("Đã xảy ra lỗi khi like bài đăng.");
+            }
+        });
+    });
+</script>

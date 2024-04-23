@@ -20,5 +20,10 @@ namespace DoAnCoSoAPI.Entities
         public DateTime? RegisterAt { get; set; }
         [BsonElement("lastLogin"), BsonRepresentation(BsonType.DateTime)]
         public DateTime? LastLogin { get; set; }
+        [BsonIgnoreIfNull]
+        [BsonElement("images")]
+        [BsonRepresentation(BsonType.Binary)]
+
+        public List<byte[]>? images { set; get; }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using DoAnCoSoAPI.Entities;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
+using System.Security.Claims;
 using WebApplication2.Models;
 
 namespace WebApplication2.Controllers
@@ -58,25 +61,39 @@ namespace WebApplication2.Controllers
                 return NotFound("User not found");
             }
 
-            // You should verify the password here using your hash function
-            // For demonstration purposes, let's assume PasswordHash is already hashed
-            // if (!VerifyPassword(loginRequest.Password, user.PasswordHash))
-            // {
-            //     return Unauthorized("Invalid password");
-            // }
-
-            // For demonstration purposes, let's assume PasswordHash is plaintext
+            // Kiểm tra mật khẩu
             if (loginRequest.Password != user.PasswordHash)
             {
                 return Unauthorized("Invalid password");
             }
 
-            // Update last login timestamp
-            user.LastLogin = DateTime.UtcNow;
-            await _userCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
+            // Tạo claim chứa thông tin của người dùng
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
+        new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
+        // Thêm các thông tin khác của người dùng nếu cần
+    };
 
+            // Tạo ClaimsIdentity từ danh sách claim
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Tạo và đặt cookie xác thực
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+            // Chuyển hướng đến trang chính sau khi đăng nhập thành công
             return RedirectToAction("Index", "UserPost");
         }
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            // Xóa cookie xác thực
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Chuyển hướng đến trang đăng nhập hoặc trang chính tùy thuộc vào yêu cầu của bạn
+            return RedirectToAction("Login", "user");
+        }
+
         public IActionResult Index()
         {
             return View();

@@ -19,15 +19,17 @@ namespace DoAnCoSoAPI.Entities
         [BsonRepresentation(BsonType.Binary)]
 
         public List<byte[]>? images { set; get; }
-        [BsonIgnoreIfNull]
-        [BsonElement("imageData")]
-        [BsonRepresentation(BsonType.Binary)]
-        public List<byte[]>? ImageData { get; set; }
 
         [BsonElement("createdAt"), BsonRepresentation(BsonType.DateTime)]
         public DateTime? createdAt { set; get; }
         [BsonElement("updatedAt"), BsonRepresentation(BsonType.DateTime)]
         public DateTime? updatedAt { set; get; }
+        public string CreatorId { get; set; }
+        public string CreatorName { get; set; }
+        [BsonElement("likes")]
+        public int Likes { get; set; }
+        [BsonElement("likedByUsers")]
+        public List<string> LikedByUsers { get; set; } = new List<string>();
     }
 
 }
