@@ -1,0 +1,45 @@
+﻿@model DoAnCoSoAPI.Entities.User_Post
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1 class="title-h1">ĐĂNG BÀI</h1>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <form asp-action="Create" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group form-setting">
+                <label asp-for="title" class="control-label">Chủ đề</label>
+                <input asp-for="title" class="form-control" />
+                <span asp-validation-for="title" class="text-danger"></span>
+            </div>
+            <div class="form-group form-setting">
+                <label asp-for="content" class="control-label">Nội dung</label>
+                <input asp-for="content" class="form-control" />
+                <span asp-validation-for="content" class="text-danger"></span>
+            </div>
+            <div class="form-group form-setting">
+                <label asp-for="images" class="control-label">Hình ảnh</label>
+                <input type="file" name="images" class="form-control" multiple />
+                <span asp-validation-for="images" class="text-danger"></span>
+            </div>
+            <div class="form-group form-setting">
+                <input type="submit" value="Đăng bài" class="button" />
+            </div>
+        </form>
+    </div>
+    <div class="col-md-3"></div>
+    <div>
+        <a asp-action="Index" class="button">Trở về</a>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
