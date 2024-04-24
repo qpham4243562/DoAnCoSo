@@ -1,0 +1,32 @@
+﻿@using System.Security.Claims
+@model IEnumerable<DoAnCoSoAPI.Entities.User_comment>
+
+<h2>Comments</h2>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@if (Model != null && Model.Any())
+{
+    <ul>
+        @foreach (var comment in Model)
+        {
+            <li>
+                <div>@comment.comment</div>
+                <div>Created At: @comment.createdAt</div>
+                <div>User Name: @comment.UserName</div>
+                @if (User.Identity.IsAuthenticated && comment.CreatorId == User.FindFirst(ClaimTypes.NameIdentifier)?.Value)
+                {
+                    <form method="post" action="/DeleteComment/@ViewBag.PostId/@comment.id">
+                        <div>
+                            <button type="submit">Delete</button>
+                        </div>
+                    </form>
+
+
+                }
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>No comments found.</p>
+}

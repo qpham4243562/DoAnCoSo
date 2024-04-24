@@ -30,6 +30,7 @@ namespace DoAnCoSoAPI.Entities
         public int Likes { get; set; }
         [BsonElement("likedByUsers")]
         public List<string> LikedByUsers { get; set; } = new List<string>();
+        public List<User_comment> Comments { get; set; } // Thêm thuộc tính Comments
     }
 
 }

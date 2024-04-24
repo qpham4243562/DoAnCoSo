@@ -25,12 +25,13 @@ namespace WebApplication2.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-
             List<User_Post> postList;
             try
             {
-                // Lấy tất cả các User_Post từ collection
-                postList = await _userPostCollection.Find(_ => true).ToListAsync();
+                // Lấy tất cả các User_Post từ collection và sắp xếp theo thời gian tạo giảm dần
+                postList = await _userPostCollection.Find(_ => true)
+                                                     .SortByDescending(post => post.createdAt)
+                                                     .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -41,6 +42,7 @@ namespace WebApplication2.Controllers
 
             return View(postList);
         }
+
         [HttpGet]
         public IActionResult Create()
         {

@@ -98,11 +98,16 @@
                     </td>
                     <td>
                         <div id="likes-count-@item.id">@item.Likes</div>
-                    </td>
-                    <td>
                         <button class="like-btn" data-postid="@item.id">Like</button>
                     </td>
-
+                    <td>
+                        <a href="@Url.Action("Index", "Comment", new { postId = item.id })" class="btn btn-primary">Comment</a>
+                    </td>
+                    <td>
+                    <p>
+                        <a asp-controller="Comment" asp-action="AddComment" asp-route-postId="@item.id">Create New Comment</a>
+                    </p>
+                    </td>
                     <td>
                         @Html.ActionLink("Update", "Update", new { id = item.id }) |
 
