@@ -28,7 +28,10 @@ body {
 .navbar-brand {
     padding: 0; /* Loại bỏ padding của phần tử a */
 }
-
+/* định dạng màu nền navabr register */
+.bg-orange {
+    background-color: #FC8717 !important;
+}
 /* Định dạng hình ảnh logo */
 .logo {
     max-width: 100%; /* Hình ảnh không vượt quá kích thước của phần tử mẹ */
@@ -134,3 +137,23 @@ body {
         cursor: pointer; /* Indicate clickable behavior */
     }
 
+/* định dạng văn bản register */
+.res-text {
+    text-align: center;
+    color: #FC8717;
+}
+
+.img-signin {
+   margin-left: 25%;
+   margin-top: -7%;
+}
+
+.res-footer {
+    background-color: #FC8717;
+    text-align: center;
+    color: white;
+}
+
+.res-footer > p {
+    padding: 25px 0;
+}
