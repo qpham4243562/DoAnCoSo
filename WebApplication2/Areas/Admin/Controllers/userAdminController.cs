@@ -109,6 +109,25 @@ namespace WebApplication2.Areas.Admin.Controllers
                 return NotFound();
             }
         }
+        [HttpGet("Admin/userAdmin/Search")]
+        public async Task<IActionResult> Search(string email)
+        {
+            Console.WriteLine($"Searching for email: {email}");
 
+            // Kiểm tra xem email được cung cấp hay không
+            if (string.IsNullOrEmpty(email))
+            {
+                Console.WriteLine("No email provided, returning all users.");
+                var users = await _userCollection.Find(u => true).ToListAsync();
+                return View("Index", users);
+            }
+
+            Console.WriteLine("Searching for users with email containing the provided value.");
+            var usersFound = await _userCollection.Find(u => u.Email.Contains(email)).ToListAsync();
+            Console.WriteLine($"Found {usersFound.Count} users.");
+
+            // Trả về view với danh sách người dùng tìm thấy
+            return View("Index", usersFound);
+        }
     }
 }

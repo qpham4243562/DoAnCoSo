@@ -163,7 +163,7 @@ namespace WebApplication2.Areas.Admin.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken] // Thêm xác thực CSRF
+        
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
             // Kiểm tra xem ID của bài đăng có hợp lệ hay không
@@ -184,5 +184,26 @@ namespace WebApplication2.Areas.Admin.Controllers
             // Chuyển hướng về trang chủ hoặc trang danh sách bài đăng
             return RedirectToAction("Index", "UserPostAdmin");
         }
+        [HttpGet("Admin/UserPostAdmin/Search")]
+        public async Task<IActionResult> Search(string id)
+        {
+            Console.WriteLine($"Searching for id: {id}");
+
+            // Kiểm tra xem id được cung cấp hay không
+            if (string.IsNullOrEmpty(id))
+            {
+                Console.WriteLine("No id provided, returning all posts.");
+                var allPosts = await _userPostCollection.Find(_ => true).ToListAsync();
+                return View("Index", allPosts);
+            }
+
+            Console.WriteLine($"Searching for posts with ID: {id}");
+            var postsFound = await _userPostCollection.Find(post => post.id == id).ToListAsync();
+            Console.WriteLine($"Found {postsFound.Count} posts.");
+
+            // Trả về view với danh sách bài đăng tìm thấy
+            return View("Index", postsFound);
+        }
+
     }
 }
