@@ -1,0 +1,72 @@
+﻿@model IEnumerable<DoAnCoSoAPI.Entities.user_report>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<div>
+    <input id="postIdInput" class="form-control" type="text" placeholder="Enter post ID..." aria-label="Enter post ID...">
+    <button class="btn btn-primary" id="searchButton" type="button">Search</button>
+</div>
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PostId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Reason)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PostId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Reason)
+            </td>
+            <td>
+                @Html.ActionLink("Delete", "Delete", new { id = item.id })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+    
+        $("#searchButton").click(function () {
+            // Lấy giá trị ID của bài đăng từ input field
+            var postId = $("#postIdInput").val();
+
+            // Gửi yêu cầu AJAX đến controller
+            $.ajax({
+                type: "GET",
+                url: "/Admin/UserReportAdmin/Search?id=" + postId,
+                success: function (response) {
+                    // Xử lý phản hồi từ controller, hiển thị kết quả
+                    // Ví dụ: chuyển hướng đến trang chi tiết bài đăng
+                    window.location.href = "/Admin/UserReportAdmin/Search?id=" + postId;
+                },
+                error: function (error) {
+                    console.error("Error:", error);
+                }
+            });
+        });
+    });
+</script>

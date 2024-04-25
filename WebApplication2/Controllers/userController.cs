@@ -36,7 +36,7 @@ namespace WebApplication2.Controllers
             {
                 return Conflict("User with this email already exists");
             }
-
+            user.role = "user";
             // Set registration timestamp
             user.RegisterAt = DateTime.UtcNow;
 
@@ -66,7 +66,8 @@ namespace WebApplication2.Controllers
             {
                 return Unauthorized("Invalid password");
             }
-
+            user.LastLogin = DateTime.UtcNow;
+            await _userCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
             // Tạo claim chứa thông tin của người dùng
             var claims = new List<Claim>
     {
@@ -75,6 +76,12 @@ namespace WebApplication2.Controllers
         // Thêm các thông tin khác của người dùng nếu cần
     };
 
+            // Kiểm tra và thêm vai trò của người dùng
+            if (user.role == "admin")
+            {
+                claims.Add(new Claim(ClaimTypes.Role, "admin"));
+                return RedirectToAction("Index", "Home", new { area = "admin" });
+            }
             // Tạo ClaimsIdentity từ danh sách claim
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -84,6 +91,7 @@ namespace WebApplication2.Controllers
             // Chuyển hướng đến trang chính sau khi đăng nhập thành công
             return RedirectToAction("Index", "UserPost");
         }
+
         [HttpPost("Logout")]
         public async Task<IActionResult> Logout()
         {

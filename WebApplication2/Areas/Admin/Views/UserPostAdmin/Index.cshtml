@@ -1,0 +1,135 @@
+﻿@model IEnumerable<DoAnCoSoAPI.Entities.User_Post>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<div>
+    <input id="postIdInput" class="form-control" type="text" placeholder="Enter post ID..." aria-label="Enter post ID...">
+    <button class="btn btn-primary" id="searchButton" type="button">Search</button>
+</div>
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.content)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.createdAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.updatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatorId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatorName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.images)
+                <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="imageModalLabel">Post Image</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <img id="modalImage" src="" alt="Post Image" style="max-width: 100%; max-height: 400px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.content)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.createdAt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.updatedAt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatorId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CreatorName)
+                </td>
+                <td>
+                   
+                    
+
+                    @if (item.images != null && item.images.Any())
+                    {
+                        foreach (var image in item.images)
+                        {
+                            <img class="post-image" src="data:image/jpeg;base64,@Convert.ToBase64String(image)" alt="Post Image" style="max-width: 100px; max-height: 100px;" />
+                        }
+                    }
+
+                </td>
+                <td>
+
+                    @Html.ActionLink("Delete", "Delete", new { id = item.id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        $("body").on("click", ".post-image", function () {
+            var imageUrl = $(this).attr("src");
+            $("#modalImage").attr("src", imageUrl);
+            $("#imageModal").modal("show");
+        });
+        $("#searchButton").click(function () {
+            // Lấy giá trị ID của bài đăng từ input field
+            var postId = $("#postIdInput").val();
+
+            // Gửi yêu cầu AJAX đến controller
+            $.ajax({
+                type: "GET",
+                url: "/Admin/UserPostAdmin/Search?id=" + postId,
+                success: function (response) {
+                    // Xử lý phản hồi từ controller, hiển thị kết quả
+                    // Ví dụ: chuyển hướng đến trang chi tiết bài đăng
+                    window.location.href = "/Admin/UserPostAdmin/Search?id=" + postId;
+                },
+                error: function (error) {
+                    console.error("Error:", error);
+                }
+            });
+        });
+    });
+</script>
