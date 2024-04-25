@@ -23,6 +23,9 @@ namespace DoAnCoSoAPI.Entities
         [BsonIgnoreIfNull]
         [BsonElement("images")]
         [BsonRepresentation(BsonType.Binary)]
-        public List<byte[]>? images { set; get; }
+        public byte? images { set; get; }
+        [BsonElement("role"), BsonRepresentation(BsonType.String)]
+        public string? role { get; set; }
+
     }
 }
