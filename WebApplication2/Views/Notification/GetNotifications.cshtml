@@ -57,7 +57,7 @@
                     url: "/mark-notification-read/" + notificationId,
                     type: "GET",
                     success: function (response) {
-                        alert("Đã đánh dấu thông báo là đã đọc");
+                        window.location.reload();
                         // Cập nhật giao diện người dùng nếu cần thiết
                     },
                     error: function (xhr, status, error) {

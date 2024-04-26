@@ -177,7 +177,7 @@ namespace WebApplication2.Controllers
 
                 TempData["SuccessMessage"] = "Comment deleted successfully"; // Lưu thông báo xóa thành công vào TempData
 
-                return RedirectToAction("Index", "UserPost"); // Chuyển hướng đến trang chính sau khi xóa comment thành công
+                return Ok(); // Trả về 200 OK để JavaScript biết rằng việc xóa comment đã thành công
             }
             catch (Exception ex)
             {
@@ -185,5 +185,6 @@ namespace WebApplication2.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
     }
 }

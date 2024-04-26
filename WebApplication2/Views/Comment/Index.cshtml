@@ -14,11 +14,12 @@
                 <div>User Name: @comment.UserName</div>
                 @if (User.Identity.IsAuthenticated && comment.CreatorId == User.FindFirst(ClaimTypes.NameIdentifier)?.Value)
                 {
-                    <form method="post" action="/DeleteComment/@ViewBag.PostId/@comment.id">
+                    <form id="deleteCommentForm" method="post" action="/DeleteComment/@ViewBag.PostId/@comment.id">
                         <div>
-                            <button type="submit">Delete</button>
+                            <button id="delete-btn" type="submit">Delete</button>
                         </div>
                     </form>
+
 
 
                 }
@@ -65,6 +66,28 @@ else
                 }
             });
         }
+        // Xử lý sự kiện khi nhấn nút "Delete"
+        $("#delete-btn").click(function (event) {
+            event.preventDefault(); // Ngăn chặn hành động mặc định của form
+
+            // Lấy action của form
+            var actionUrl = $("#deleteCommentForm").attr("action");
+
+            // Gửi yêu cầu xóa bằng Ajax
+            $.ajax({
+                type: "POST",
+                url: actionUrl,
+                success: function () {
+                    // Nếu xóa comment thành công, làm gì đó (ví dụ: cập nhật giao diện)
+                    // Sau đó có thể tải lại trang hoặc thực hiện các hành động khác
+                    window.location.reload();
+                },
+                error: function () {
+                    // Xử lý lỗi nếu có
+                    alert("Đã xảy ra lỗi khi xóa comment.");
+                }
+            });
+        });
     });
 </script>
 
