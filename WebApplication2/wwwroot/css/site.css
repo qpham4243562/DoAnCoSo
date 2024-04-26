@@ -167,3 +167,16 @@ body {
 svg.bi-bell-fill {
     pointer-events: none;
 }
+#commentInput {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 1400px; /* Đặt độ dài của input là 200px */
+    z-index: 999;
+}
+#createCommentButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px; /* Đặt vị trí của button ở góc dưới bên phải */
+    z-index: 999;
+}

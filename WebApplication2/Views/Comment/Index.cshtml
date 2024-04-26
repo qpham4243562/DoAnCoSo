@@ -30,3 +30,38 @@ else
 {
     <p>No comments found.</p>
 }
+<input type="text" id="commentInput" placeholder="Type your comment here..." />
+<button id="createCommentButton">Create</button>
+<script>
+    $(document).ready(function () {
+        // Xử lý sự kiện khi nhấn Enter trong input
+        $("#commentInput").keypress(function (event) {
+            if (event.which == 13) { // Nếu nhấn phím Enter
+                event.preventDefault(); // Ngăn chặn hành động mặc định của phím Enter
+                addComment(); // Gọi hàm thêm comment
+            }
+        });
+
+        // Xử lý sự kiện khi click vào nút "Create"
+        $("#createCommentButton").click(function () {
+            addComment(); // Gọi hàm thêm comment
+        });
+
+        // Hàm thêm comment
+        function addComment() {
+            var commentText = $("#commentInput").val(); // Lấy nội dung comment từ input
+            $.ajax({
+                url: "/AddComment", // Đường dẫn của action xử lý thêm comment
+                method: "POST",
+                data: { postId: "@ViewBag.PostId", newComment: { comment: commentText } }, // Dữ liệu gửi đi (postId và nội dung comment)
+                success: function () {
+                    // Thêm comment thành công, làm gì đó nếu cần
+                    // Ví dụ: Cập nhật danh sách comment mà không cần tải lại trang
+                },
+                error: function () {
+                    // Xử lý lỗi nếu có
+                }
+            });
+        }
+    });
+</script>
