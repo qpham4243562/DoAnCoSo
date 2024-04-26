@@ -15,12 +15,14 @@ namespace WebApplication2.Controllers
         private readonly IMongoCollection<User_Post> _userPostCollection;
         private readonly IMongoCollection<User> _userCollection;
         private readonly IMongoCollection<LikedPost> _likedPostCollection;
+        private readonly IMongoCollection<Notification> _notificationCollection;
         public UserPostController(IMongoClient mongoClient)
         {
             // Thay thế "your_database_name" và "your_collection_name" với tên database và collection của bạn
             _userPostCollection = mongoClient.GetDatabase("DoAn").GetCollection<User_Post>("user_Post");
             _userCollection = mongoClient.GetDatabase("DoAn").GetCollection<User>("user");
             _likedPostCollection = mongoClient.GetDatabase("DoAn").GetCollection<LikedPost>("LikedPosts");
+            _notificationCollection = mongoClient.GetDatabase("DoAn").GetCollection<Notification>("notification");
         }
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -191,7 +193,7 @@ namespace WebApplication2.Controllers
         public async Task<IActionResult> LikePost(string postId)
         {
             // Lấy thông tin người dùng từ cookie
-            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var currentUserId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             // Tìm bài đăng theo postId
             var post = await _userPostCollection.Find(p => p.id == postId).FirstOrDefaultAsync();
@@ -202,19 +204,40 @@ namespace WebApplication2.Controllers
             }
 
             // Kiểm tra xem người dùng đã like bài đăng này chưa
-            var userLiked = post.LikedByUsers.Contains(userId);
+            var userLiked = post.LikedByUsers.Contains(currentUserId);
 
             if (userLiked)
             {
                 // Nếu đã like, xóa like của người dùng khỏi danh sách
-                post.LikedByUsers.Remove(userId);
+                post.LikedByUsers.Remove(currentUserId);
                 post.Likes--;
             }
             else
             {
                 // Nếu chưa like, thêm userId vào danh sách
-                post.LikedByUsers.Add(userId);
+                post.LikedByUsers.Add(currentUserId);
                 post.Likes++;
+
+                // Tạo notification mới
+                var notification = new Notification
+                {
+                    UserId = post.CreatorId, // Id của người đăng bài
+                    Content = $"{HttpContext.User.Identity.Name} đã thích bài đăng của bạn.",
+                    Type = "like",
+                    PostId = postId,
+                    CreatedAt = DateTime.Now,
+                    IsRead = false
+                };
+
+                // Lấy người đăng bài
+                var user = await _userCollection.Find(u => u.Id == post.CreatorId).FirstOrDefaultAsync();
+
+                // Kiểm tra nếu user không null
+                if (user != null)
+                {
+                    // Thêm notification vào collection _notificationCollection
+                    await _notificationCollection.InsertOneAsync(notification);
+                }
             }
 
             // Cập nhật bài đăng

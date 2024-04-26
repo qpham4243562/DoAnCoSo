@@ -22,8 +22,12 @@
                 </form>
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="bi bi-bell-fill" style="color: white;"></i></a>
+                        <a class="nav-link" href="https://localhost:7222/Notification/GetNotifications">
+                            <i class="bi bi-bell-fill" style="color: white;"></i>
+                            <span id="unreadCount" class="badge badge-danger">0</span>
+                        </a>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="#"><i class="bi bi-chat-dots-fill" style="color: white;"></i></a>
                     </li>
@@ -63,6 +67,21 @@
 
             // Chuyển hướng đến trang đăng nhập sau khi đăng xuất thành công
             window.location.href = '/user/Login';
+        });
+        function getUnreadCount() {
+            // Thực hiện yêu cầu AJAX để lấy số lượng thông báo chưa đọc từ máy chủ
+            $.get("/Notification/GetUnreadCount", function (data) {
+                // Cập nhật giá trị của phần tử <span> với số lượng thông báo chưa đọc
+                $("#unreadCount").text(data);
+            });
+        }
+
+        // Gọi hàm để cập nhật số lượng thông báo chưa đọc khi trang được tải
+        getUnreadCount();
+
+        // Xử lý sự kiện click trên biểu tượng chuông để cập nhật lại số lượng thông báo chưa đọc
+        $(".nav-link").click(function () {
+            getUnreadCount();
         });
     });
 </script>

@@ -14,6 +14,7 @@ namespace WebApplication2.Controllers
         private readonly IMongoCollection<User_comment> _userCommentCollection;
         private readonly IMongoCollection<User_Post> _userPostCollection;
         private readonly IMongoCollection<User> _userCollection;
+        private readonly IMongoCollection<Notification> _notificationCollection;
 
         public CommentController(IMongoClient mongoClient)
         {
@@ -21,6 +22,7 @@ namespace WebApplication2.Controllers
             _userCommentCollection = mongoClient.GetDatabase("DoAn").GetCollection<User_comment>("user_Comment");
             _userPostCollection = mongoClient.GetDatabase("DoAn").GetCollection<User_Post>("user_Post");
             _userCollection = mongoClient.GetDatabase("DoAn").GetCollection<User>("user");
+            _notificationCollection = mongoClient.GetDatabase("DoAn").GetCollection<Notification>("notification");
         }
         [HttpGet]
         public async Task<IActionResult> Index(string postId)
@@ -64,6 +66,7 @@ namespace WebApplication2.Controllers
                 // Truyền danh sách các comment vào view cùng với newComment để người dùng có thể nhập thông tin cho comment mới
                 ViewBag.Comments = post.Comments;
                 return View(newComment);
+
             }
             else
             {
@@ -101,7 +104,26 @@ namespace WebApplication2.Controllers
                     post.Comments = new List<User_comment>();
                 }
                 post.Comments.Add(newComment);
+                var notification = new Notification
+                {
+                    UserId = post.CreatorId, // Id của người đăng bài
+                    Content = $"{HttpContext.User.Identity.Name} đã bình luận bài đăng của bạn.",
+                    Type = "comment",
+                    PostId = postId,
+                    CreatedAt = DateTime.Now,
+                    IsRead = false
+                };
 
+                // Lấy người đăng bài
+                var user = await _userCollection.Find(u => u.Id == post.CreatorId).FirstOrDefaultAsync();
+
+                // Kiểm tra nếu user không null
+                if (user != null)
+                {
+                    // Thêm notification vào collection _notificationCollection
+                    await _notificationCollection.InsertOneAsync(notification);
+                }
+            
                 // Cập nhật bài viết trong cơ sở dữ liệu
                 await _userPostCollection.ReplaceOneAsync(p => p.id == postId, post);
 

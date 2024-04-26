@@ -25,12 +25,12 @@
                     </select>
                 </form>
                 <div class="d-flex align-items-center mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16" style="color:orange; padding: 10px 10px 10px 10px">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16" style="color:orange; padding: 10px 10px 10px 10px" title="">
                         <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
                         <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
                     </svg>
-                    <form class="form-inline ml-2">
-                        <input type="text" placeholder="Nhập văn bản vào đây..." class="large-input">
+                    <form id="textForm" class="form-inline ml-2">
+                        <input type="text" id="textInput" placeholder="Nhập văn bản vào đây..." class="large-input">
                     </form>
                 </div>
                 <div class="button-container">
@@ -39,6 +39,7 @@
             </div>
         </div>
     </div>
+</div>
     <table class="table table-warning table-striped table-bordered">
         <thead>
             <tr>
@@ -138,5 +139,8 @@
                 alert("Đã xảy ra lỗi khi like bài đăng.");
             }
         });
+    });
+    document.getElementById('textInput').addEventListener('click', function () {
+        window.location.href = '/UserPost/Create';
     });
 </script>

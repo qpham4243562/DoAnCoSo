@@ -157,3 +157,13 @@ body {
 .res-footer > p {
     padding: 25px 0;
 }
+#unreadCount {
+    position: absolute;
+    top: 6;
+    right: 103px;
+    transform: translate(0%, -50%);
+    font-size: 0.75rem;
+}
+svg.bi-bell-fill {
+    pointer-events: none;
+}

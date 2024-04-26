@@ -26,6 +26,7 @@ namespace DoAnCoSoAPI.Entities
         public byte? images { set; get; }
         [BsonElement("role"), BsonRepresentation(BsonType.String)]
         public string? role { get; set; }
+        
 
     }
 }

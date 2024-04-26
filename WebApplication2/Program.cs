@@ -67,5 +67,4 @@ app.UseEndpoints(endpoints =>
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=user}/{action=Login}/{id?}");
-
 app.Run();
