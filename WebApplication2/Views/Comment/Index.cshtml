@@ -32,6 +32,7 @@ else
 }
 <input type="text" id="commentInput" placeholder="Type your comment here..." />
 <button id="createCommentButton">Create</button>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
         // Xử lý sự kiện khi nhấn Enter trong input
@@ -51,10 +52,11 @@ else
         function addComment() {
             var commentText = $("#commentInput").val(); // Lấy nội dung comment từ input
             $.ajax({
-                url: "/AddComment", // Đường dẫn của action xử lý thêm comment
+                url: "/AddComment/@ViewBag.PostId", // Đường dẫn của action xử lý thêm comment (chú ý truyền postId)
                 method: "POST",
-                data: { postId: "@ViewBag.PostId", newComment: { comment: commentText } }, // Dữ liệu gửi đi (postId và nội dung comment)
+                data: { comment: commentText }, // Dữ liệu gửi đi (nội dung comment)
                 success: function () {
+                    window.location.reload();
                     // Thêm comment thành công, làm gì đó nếu cần
                     // Ví dụ: Cập nhật danh sách comment mà không cần tải lại trang
                 },
@@ -65,3 +67,4 @@ else
         }
     });
 </script>
+
