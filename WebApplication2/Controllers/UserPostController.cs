@@ -44,7 +44,7 @@ namespace WebApplication2.Controllers
 
             return View(postList);
         }
-
+        
         [HttpGet]
         public IActionResult Create()
         {

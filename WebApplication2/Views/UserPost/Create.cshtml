@@ -1,4 +1,5 @@
-﻿@model DoAnCoSoAPI.Entities.User_Post
+﻿@using DoAnCoSoAPI.Entities
+@model DoAnCoSoAPI.Entities.User_Post
 
 @{
     ViewData["Title"] = "Create";
@@ -25,6 +26,30 @@
                 <input type="file" name="images" class="form-control" multiple />
                 <span asp-validation-for="images" class="text-danger"></span>
             </div>
+            <div class="row">
+                <div class="col-md-5 form-group form-setting">
+                    <select asp-for="Class" class="custom-select mr-sm-2 dropdown-orange">
+                        <option selected value="">Chọn khối</option>
+                        @foreach (var c in Class.AllClasses)
+                        {
+                            <option value="@c.Name">@c.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Class" class="text-danger"></span>
+                </div>
+                <div class="col-md-7 form-group form-setting">
+                   
+                    <select asp-for="Subject" class="custom-select mr-sm-2 dropdown-orange">
+                        <option selected value="">Chọn môn học</option>
+                        @foreach (var s in Subject.AllSubjects) // Assuming you have a populated list of subjects
+                        {
+                            <option value="@s.Name">@s.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Subject" class="text-danger"></span>
+                </div>
+            </div>
+
             <div class="form-group form-setting">
                 <input type="submit" value="Đăng bài" class="button" />
             </div>

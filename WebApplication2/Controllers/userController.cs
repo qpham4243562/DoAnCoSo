@@ -66,6 +66,10 @@ namespace WebApplication2.Controllers
             {
                 return Unauthorized("Invalid password");
             }
+            if (user.IsOnline==true)
+            {
+                return Unauthorized("Nguoi dung dang online");
+            }
             user.LastLogin = DateTime.UtcNow;
             await _userCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
             // Tạo claim chứa thông tin của người dùng
