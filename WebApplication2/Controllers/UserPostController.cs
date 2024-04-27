@@ -25,26 +25,32 @@ namespace WebApplication2.Controllers
             _notificationCollection = mongoClient.GetDatabase("DoAn").GetCollection<Notification>("notification");
         }
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string selectedClass, string selectedSubject)
         {
             List<User_Post> postList;
+            var filter = Builders<User_Post>.Filter.Empty;
+
+            if (!string.IsNullOrEmpty(selectedClass))
+                filter &= Builders<User_Post>.Filter.Eq(p => p.Class, selectedClass);
+
+            if (!string.IsNullOrEmpty(selectedSubject))
+                filter &= Builders<User_Post>.Filter.Eq(p => p.Subject, selectedSubject);
+
             try
             {
-                // Lấy tất cả các User_Post từ collection và sắp xếp theo thời gian tạo giảm dần
-                postList = await _userPostCollection.Find(_ => true)
-                                                     .SortByDescending(post => post.createdAt)
-                                                     .ToListAsync();
+                postList = await _userPostCollection.Find(filter)
+                                                    .SortByDescending(post => post.createdAt)
+                                                    .ToListAsync();
             }
             catch (Exception ex)
             {
-                // Xử lý ngoại lệ khi truy vấn MongoDB
                 ModelState.AddModelError(string.Empty, $"An error occurred while fetching user posts from MongoDB: {ex.Message}");
-                postList = new List<User_Post>(); // Khởi tạo danh sách rỗng để tránh lỗi
+                postList = new List<User_Post>();
             }
 
             return View(postList);
         }
-        
+
         [HttpGet]
         public IActionResult Create()
         {

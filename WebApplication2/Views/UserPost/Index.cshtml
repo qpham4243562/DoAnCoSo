@@ -10,24 +10,24 @@
     <div class="row">
         <div class="col">
             <div class="custom-select-container">
-                <form class="form-inline mb-3">
-                    <select class="custom-select mr-sm-2 dropdown-orange">
-                        <option selected>Chọn khối</option>
+                <form class="form-inline mb-3" asp-action="Index" method="get">
+                    <select class="custom-select mr-sm-2 dropdown-orange" id="selectedClass" name="selectedClass">
+                        <option value="">Chọn khối</option>
                         @foreach (var c in Class.AllClasses)
                         {
-                            <option value="@c.Id">@c.Name</option>
+                            <option value="@c.Name">@c.Name</option>
                         }
                     </select>
 
-
-                    <select class="custom-select mr-sm-2 dropdown-orange">
-                        <option selected>Chọn môn học</option>
-                        @foreach (var c in Subject.AllSubjects)
+                    <select class="custom-select mr-sm-2 dropdown-orange" id="selectedSubject" name="selectedSubject">
+                        <option value="">Chọn môn học</option>
+                        @foreach (var s in Subject.AllSubjects)
                         {
-                            <option value="@c.Id">@c.Name</option>
+                            <option value="@s.Name">@s.Name</option>
                         }
-                        <!-- Thêm các tùy chọn khác nếu cần -->
                     </select>
+
+                    <button type="submit" class="btn btn-primary">Lọc</button>
                 </form>
                 <div class="d-flex align-items-center mb-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16" style="color:orange; padding: 10px 10px 10px 10px" title="">
