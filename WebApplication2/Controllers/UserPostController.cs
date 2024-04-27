@@ -251,5 +251,27 @@ namespace WebApplication2.Controllers
 
             return Ok(new { likes = post.Likes });
         }
+        [HttpGet]
+        public async Task<IActionResult> Search(string searchString)
+        {
+            List<User_Post> searchResults;
+            var filter = Builders<User_Post>.Filter.Or(
+                Builders<User_Post>.Filter.Regex("title", new BsonRegularExpression(searchString, "i")),
+                Builders<User_Post>.Filter.Regex("content", new BsonRegularExpression(searchString, "i"))
+            );
+
+            try
+            {
+                searchResults = await _userPostCollection.Find(filter).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred while searching: {ex.Message}");
+                searchResults = new List<User_Post>();
+            }
+
+            return View(searchResults);
+        }
+
     }
 }
