@@ -1,0 +1,87 @@
+﻿@model DoAnCoSoAPI.Entities.User
+
+@{
+    ViewData["Title"] = "Update";
+}
+
+<h1>Update</h1>
+
+<h4>User</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Update" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PasswordHash" class="control-label"></label>
+                <input asp-for="PasswordHash" class="form-control" />
+                <span asp-validation-for="PasswordHash" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group form-setting">
+                <label asp-for="images" class="control-label">Hình ảnh</label>
+                <input type="file" name="images" class="form-control" multiple />
+                <span asp-validation-for="images" class="text-danger"></span>
+                @if (Model.images != null)
+                {
+                    <img src="data:image;base64,@Convert.ToBase64String(Model.images)" class="img-thumbnail" />
+                }
+            </div>
+            
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<button id="deleteAccountBtn" class="btn btn-danger">Xóa Tài Khoản</button>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Mã JavaScript -->
+<script>
+    // Lắng nghe sự kiện khi trang đã được tải hoàn thành
+    document.addEventListener("DOMContentLoaded", function () {
+        // Lắng nghe sự kiện khi nút xóa tài khoản được nhấn
+        document.getElementById("deleteAccountBtn").addEventListener("click", function () {
+            // Hiển thị hộp thoại xác nhận trước khi thực hiện xóa
+            if (confirm("Bạn có chắc chắn muốn xóa tài khoản không?")) {
+                // Gửi yêu cầu POST để xóa tài khoản
+                fetch('/user/DeleteAccount', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // Thêm CSRF token nếu cần thiết
+                    }
+                })
+                    .then(response => {
+                        // Kiểm tra xem yêu cầu đã được xử lý thành công hay không
+                        if (!response.ok) {
+                            window.location.href = '/user/Login';
+                        }
+                        // Nếu thành công, chuyển hướng đến trang đăng nhập
+                        throw new Error('Failed to delete account');
+                        
+                    })
+                    .catch(error => {
+                        window.location.href = '/user/Login';
+                    });
+            }
+        });
+    });
+</script>

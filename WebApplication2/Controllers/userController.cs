@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using System.Security.Claims;
 using WebApplication2.Models;
+using DoAnCoSoAPI.Data;
 
 namespace WebApplication2.Controllers
 {
+    
     public class userController : Controller
     {
         private readonly IMongoCollection<User> _userCollection;
@@ -105,10 +107,82 @@ namespace WebApplication2.Controllers
             // Chuyển hướng đến trang đăng nhập hoặc trang chính tùy thuộc vào yêu cầu của bạn
             return RedirectToAction("Login", "user");
         }
-
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Update()
         {
-            return View();
+            // Lấy userId từ cookie đăng nhập
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Tìm thông tin người dùng từ userId
+            var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            return View(user);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Update(User updatedUser, IFormFileCollection images)
+        {
+            // Lấy userId từ cookie đăng nhập
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Tìm người dùng trong cơ sở dữ liệu sử dụng userId
+            var userToUpdate = await _userCollection.FindOneAndUpdateAsync(
+                Builders<User>.Filter.Eq(u => u.Id, userId), // Điều kiện tìm kiếm
+                Builders<User>.Update
+                    .Set(u => u.FirstName, updatedUser.FirstName)
+                    .Set(u => u.LastName, updatedUser.LastName)
+                    .Set(u => u.Email, updatedUser.Email)
+                    .Set(u => u.PasswordHash, updatedUser.PasswordHash)
+                    
+            // Cập nhật các trường khác cần thiết tại đây
+            );
+
+            // Kiểm tra xem người dùng đã được cập nhật thành công hay không
+            if (userToUpdate == null)
+            {
+                return NotFound("User not found");
+            }
+            foreach (var image in images)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await image.CopyToAsync(memoryStream);
+                    userToUpdate.images = memoryStream.ToArray();
+                }
+            }
+
+            // Cập nhật người dùng sau khi đã có hình ảnh mới
+            await _userCollection.ReplaceOneAsync(u => u.Id == userId, userToUpdate);
+            return RedirectToAction("Update", "user");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            // Lấy userId từ cookie đăng nhập
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Xóa người dùng từ cơ sở dữ liệu
+            var deleteResult = await _userCollection.DeleteOneAsync(u => u.Id == userId);
+            if (deleteResult.DeletedCount == 0)
+            {
+                return NotFound("Failed to delete user");
+            }
+
+            // Đăng xuất người dùng
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Chuyển hướng đến trang đăng nhập hoặc trang chính tùy thuộc vào yêu cầu của bạn
+            return RedirectToAction("Login", "user");
+        }
+
+
+
+
     }
 }

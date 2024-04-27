@@ -23,7 +23,7 @@ namespace DoAnCoSoAPI.Entities
         [BsonIgnoreIfNull]
         [BsonElement("images")]
         [BsonRepresentation(BsonType.Binary)]
-        public byte? images { set; get; }
+        public byte[] images { set; get; }
         [BsonElement("role"), BsonRepresentation(BsonType.String)]
         public string? role { get; set; }
         [BsonElement("IsOnline"), BsonRepresentation(BsonType.Boolean)]
