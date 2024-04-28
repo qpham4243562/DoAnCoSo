@@ -1,0 +1,74 @@
+﻿@model DoAnCoSoAPI.Entities.User
+
+@{
+    ViewData["Title"] = "Index";
+    // Extension method
+   
+}
+
+<h1>Trang cá nhân</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.images)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => modelItem.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => modelItem.LastName)
+            </td>
+            <td>
+                @if (Model.images.ToImages().Any())
+                {
+                    <div class="image-container">
+                        @foreach (var image in Model.images.ToImages())
+                        {
+                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(image)" alt="User Image" style="max-width: 100px; max-height: 100px;" />
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p>No images available.</p>
+                }
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div id="personalPageContainer"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Tải nội dung của trang "PersonalPage" và render vào trong placeholder
+    loadPersonalPage();
+
+    // Hàm để tải nội dung của trang "PersonalPage"
+    function loadPersonalPage() {
+        $.ajax({
+            url: '/UserPost/PersonalPage', // Đường dẫn tới trang "PersonalPage"
+            type: 'GET',
+            success: function(data) {
+                // Sau khi tải thành công, render nội dung vào placeholder
+                $('#personalPageContainer').html(data);
+            },
+            error: function() {
+                console.error('Failed to load PersonalPage.');
+            }
+        });
+    }
+});
+</script>

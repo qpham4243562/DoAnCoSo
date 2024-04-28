@@ -9,7 +9,7 @@ using DoAnCoSoAPI.Data;
 
 namespace WebApplication2.Controllers
 {
-    
+
     public class userController : Controller
     {
         private readonly IMongoCollection<User> _userCollection;
@@ -68,7 +68,7 @@ namespace WebApplication2.Controllers
             {
                 return Unauthorized("Invalid password");
             }
-            if (user.IsOnline==true)
+            if (user.IsOnline == true)
             {
                 return Unauthorized("Nguoi dung dang online");
             }
@@ -127,39 +127,61 @@ namespace WebApplication2.Controllers
         [HttpPost]
         public async Task<IActionResult> Update(User updatedUser, IFormFileCollection images)
         {
-            // Lấy userId từ cookie đăng nhập
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // Tìm người dùng trong cơ sở dữ liệu sử dụng userId
-            var userToUpdate = await _userCollection.FindOneAndUpdateAsync(
-                Builders<User>.Filter.Eq(u => u.Id, userId), // Điều kiện tìm kiếm
-                Builders<User>.Update
-                    .Set(u => u.FirstName, updatedUser.FirstName)
-                    .Set(u => u.LastName, updatedUser.LastName)
-                    .Set(u => u.Email, updatedUser.Email)
-                    .Set(u => u.PasswordHash, updatedUser.PasswordHash)
-                    
-            // Cập nhật các trường khác cần thiết tại đây
-            );
-
-            // Kiểm tra xem người dùng đã được cập nhật thành công hay không
-            if (userToUpdate == null)
+            if (userId == null)
             {
-                return NotFound("User not found");
+                return BadRequest("User id not found in cookie");
             }
-            foreach (var image in images)
+
+            // Kiểm tra xem có hình nào được tải lên hay không
+            if (images != null && images.Count > 0)
             {
-                using (var memoryStream = new MemoryStream())
+                foreach (var image in images)
                 {
-                    await image.CopyToAsync(memoryStream);
-                    userToUpdate.images = memoryStream.ToArray();
+                    if (image.Length > 0)
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await image.CopyToAsync(memoryStream);
+                            updatedUser.images = memoryStream.ToArray();
+                            // Lưu tên file hoặc các thông tin khác liên quan đến hình ảnh nếu cần
+                        }
+                    }
                 }
             }
 
-            // Cập nhật người dùng sau khi đã có hình ảnh mới
-            await _userCollection.ReplaceOneAsync(u => u.Id == userId, userToUpdate);
-            return RedirectToAction("Update", "user");
+            // Đảm bảo rằng bạn đã cập nhật tất cả các trường dữ liệu khác của đối tượng người dùng
+            // ở đây trước khi thực hiện cập nhật trong cơ sở dữ liệu
+
+            // Xóa trường _id từ đối tượng updatedUser
+            updatedUser.Id = null;
+
+            // Thực hiện cập nhật trong cơ sở dữ liệu
+            var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+            var update = Builders<User>.Update
+                .Set(u => u.FirstName, updatedUser.FirstName)
+                .Set(u => u.LastName, updatedUser.LastName)
+                .Set(u => u.Email, updatedUser.Email)
+                .Set(u => u.PasswordHash, updatedUser.PasswordHash);
+
+            // Nếu có hình mới được tải lên, cập nhật cả hình ảnh
+            if (images != null && images.Count > 0)
+            {
+                update = update.Set(u => u.images, updatedUser.images);
+            }
+
+            var result = await _userCollection.UpdateOneAsync(filter, update);
+
+            if (result.IsAcknowledged && result.ModifiedCount > 0)
+            {
+                return RedirectToAction("Update", "user");
+            }
+            else
+            {
+                return NotFound();
+            }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> DeleteAccount()
@@ -180,7 +202,22 @@ namespace WebApplication2.Controllers
             // Chuyển hướng đến trang đăng nhập hoặc trang chính tùy thuộc vào yêu cầu của bạn
             return RedirectToAction("Login", "user");
         }
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            // Lấy userId từ cookie đăng nhập
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            // Tìm thông tin người dùng từ userId
+            var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            return View(user);
+        }
 
 
 

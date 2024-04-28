@@ -117,18 +117,13 @@
                         <a href="@Url.Action("Index", "Comment", new { postId = item.id })" class="btn btn-primary">Comment</a>
                     </td>
                     <td>
-                        <p>
-                            <a asp-controller="Comment" asp-action="AddComment" asp-route-postId="@item.id">Create New Comment</a>
-                        </p>
+                       
                         <p>
                             <a asp-controller="userReport" asp-action="Create" asp-route-postId="@item.id">Report</a>
                         </p>
+                    <button class="save-post-btn" data-postid="@item.id">Lưu bài</button>
                     </td>
-                    <td>
-                        @Html.ActionLink("Update", "Update", new { id = item.id }) |
-
-                        @Html.ActionLink("Delete", "Delete", new { id = item.id })
-                    </td>
+                   
 
 
                 </tr>
@@ -154,5 +149,21 @@
     });
     document.getElementById('textInput').addEventListener('click', function () {
         window.location.href = '/UserPost/Create';
+    });
+    $(".save-post-btn").click(function () {
+        var postId = $(this).data("postid");
+
+        // Gửi yêu cầu lưu bài đến server
+        $.ajax({
+            type: "POST",
+            url: "/UserPost/SavePost",
+            data: { postId: postId },
+            success: function (response) {
+                alert(response); // Hiển thị thông báo từ server
+            },
+            error: function (response) {
+                alert("response");
+            }
+        });
     });
 </script>

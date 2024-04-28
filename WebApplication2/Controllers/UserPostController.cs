@@ -91,16 +91,22 @@ namespace WebApplication2.Controllers
             }
             else
             {
-                // Xử lý trường hợp không tìm thấy thông tin của người tạo
-                // Ví dụ: Gán giá trị mặc định hoặc thông báo lỗi
+                // Handle the case where creator information is not found
+                // For example: Set a default value or display an error message
                 user_Post.CreatorName = "Unknown";
             }
 
             // Save user post to the database
             await _userPostCollection.InsertOneAsync(user_Post);
 
+            // Update the user's list of posts
+            var updateDefinition = Builders<User>.Update.AddToSet(u => u.UserPosts, user_Post.id);
+            var updateResult = await _userCollection.UpdateOneAsync(u => u.Id == userId && u.UserPosts != null, updateDefinition);
+
+
             return RedirectToAction("Index", "UserPost");
         }
+
         [HttpGet]
         public async Task<IActionResult> Update(string id)
         {
@@ -154,8 +160,11 @@ namespace WebApplication2.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(string id)
         {
+            // Lấy userId từ cookie đăng nhập
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             // Kiểm tra xem ID của bài đăng có hợp lệ hay không
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(userId))
             {
                 return BadRequest();
             }
@@ -169,7 +178,22 @@ namespace WebApplication2.Controllers
                 return NotFound();
             }
 
-            // Chuyển dữ liệu của bài đăng cần xóa sang view để hiển thị thông tin
+            // Kiểm tra xem bài đăng có thuộc về người dùng hiện tại không
+            if (postToDelete.CreatorId != userId)
+            {
+                // Nếu không phải bài đăng của người dùng hiện tại, chỉ xóa khỏi UserPosts
+                // và chuyển hướng về trang chủ hoặc trang danh sách bài đăng
+                var updateResult = await _userCollection.UpdateOneAsync(u => u.Id == userId, Builders<User>.Update.Pull(u => u.UserPosts, id));
+
+                if (updateResult.ModifiedCount == 0)
+                {
+                    return NotFound();
+                }
+
+                return RedirectToAction("Index", "user");
+            }
+
+            // Nếu bài đăng là của người dùng hiện tại, hiển thị view xác nhận xóa bài đăng
             return View(postToDelete);
         }
 
@@ -177,24 +201,61 @@ namespace WebApplication2.Controllers
         [ValidateAntiForgeryToken] // Thêm xác thực CSRF
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
+            // Lấy userId từ cookie đăng nhập
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             // Kiểm tra xem ID của bài đăng có hợp lệ hay không
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(userId))
             {
                 return BadRequest();
             }
 
+            // Tìm bài đăng cần xóa trong cơ sở dữ liệu
+            var postToDelete = await _userPostCollection.Find(post => post.id == id).FirstOrDefaultAsync();
+
+            // Nếu không tìm thấy bài đăng, trả về NotFound
+            if (postToDelete == null)
+            {
+                return NotFound();
+            }
+
+            // Kiểm tra xem bài đăng có thuộc về người dùng hiện tại không
+            if (postToDelete.CreatorId != userId)
+            {
+                // Nếu không phải bài đăng của người dùng hiện tại, chỉ xóa khỏi UserPosts
+                // và chuyển hướng về trang chủ hoặc trang danh sách bài đăng
+                var updateResultUser = await _userCollection.UpdateOneAsync(u => u.Id == userId, Builders<User>.Update.Pull(u => u.UserPosts, id));
+
+                if (updateResultUser.ModifiedCount == 0)
+                {
+                    return NotFound();
+                }
+
+                return RedirectToAction("Index", "user");
+            }
+
             // Xóa bài đăng từ cơ sở dữ liệu
-            var result = await _userPostCollection.DeleteOneAsync(post => post.id == id);
+            var deleteResult = await _userPostCollection.DeleteOneAsync(post => post.id == id);
 
             // Nếu không tìm thấy bài đăng để xóa, trả về NotFound
-            if (result.DeletedCount == 0)
+            if (deleteResult.DeletedCount == 0)
+            {
+                return NotFound();
+            }
+
+            // Xóa bài đăng khỏi danh sách UserPosts của người dùng
+            var updateResultSelf = await _userCollection.UpdateOneAsync(u => u.Id == userId, Builders<User>.Update.Pull(u => u.UserPosts, id));
+
+            if (updateResultSelf.ModifiedCount == 0)
             {
                 return NotFound();
             }
 
             // Chuyển hướng về trang chủ hoặc trang danh sách bài đăng
-            return RedirectToAction("Index", "UserPost");
+            return RedirectToAction("Index", "user");
         }
+
+
         [HttpPost("like/{postId}")]
         public async Task<IActionResult> LikePost(string postId)
         {
@@ -272,6 +333,94 @@ namespace WebApplication2.Controllers
 
             return View(searchResults);
         }
+        [HttpGet]
+        public async Task<IActionResult> PersonalPage()
+        {
+            // Lấy userId từ cookie đăng nhập
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID not found in cookie");
+            }
+
+            // Tìm người dùng trong cơ sở dữ liệu dựa trên userId
+            var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Kiểm tra user trước khi truy cập UserPosts
+            if (user.UserPosts != null)
+            {
+                // Lấy danh sách postId của người dùng
+                var postIds = user.UserPosts;
+
+                // Kiểm tra postIds trước khi truy vấn bài đăng
+                if (postIds != null && postIds.Any())
+                {
+                    // Tìm các bài đăng từ danh sách postId
+                    var userPosts = await _userPostCollection.Find(post => postIds.Contains(post.id)).ToListAsync();
+
+                    return View(userPosts);
+                }
+                else
+                {
+                    // Xử lý trường hợp postIds không tồn tại hoặc không có bài đăng nào
+                    return View(new List<User_Post>()); // Trả về một danh sách trống hoặc xử lý theo nhu cầu của bạn
+                }
+            }
+            else
+            {
+                // Xử lý trường hợp UserPosts không tồn tại
+                return View(new List<User_Post>()); // Trả về một danh sách trống hoặc xử lý theo nhu cầu của bạn
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> SavePost(string postId)
+        {
+            // Lấy userId từ cookie đăng nhập
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID not found in cookie");
+            }
+
+            // Tìm người dùng trong cơ sở dữ liệu dựa trên userId
+            var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Kiểm tra xem postId đã được lưu bởi người dùng chưa
+            if (!user.UserPosts.Contains(postId))
+            {
+                // Thêm postId vào danh sách UserPosts của người dùng
+                var updateDefinition = Builders<User>.Update.Push(u => u.UserPosts, postId);
+                var updateResult = await _userCollection.UpdateOneAsync(u => u.Id == userId, updateDefinition);
+
+                // Kiểm tra kết quả cập nhật
+                if (updateResult.ModifiedCount == 1)
+                {
+                    return Ok("Post saved successfully");
+                }
+                else
+                {
+                    return Ok("Failed to save post");
+                }
+            }
+            else
+            {
+                // Nếu bài đăng đã được lưu trước đó, trả về thông báo tương ứng
+                return Ok("Post already saved");
+            }
+        }
+
 
     }
 }

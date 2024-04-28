@@ -28,6 +28,7 @@ namespace DoAnCoSoAPI.Entities
         public string? role { get; set; }
         [BsonElement("IsOnline"), BsonRepresentation(BsonType.Boolean)]
         public Boolean? IsOnline { get; set; }
-
+       
+        public List<string> UserPosts { get; set; } = new List<string>();
     }
 }
