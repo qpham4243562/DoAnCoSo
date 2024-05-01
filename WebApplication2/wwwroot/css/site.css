@@ -518,3 +518,12 @@ svg.bi-bell-fill {
 .status {
     margin-right: 20px; /* Khoảng cách giữa ảnh và thông tin người dùng */
 }
+.hinh {
+    width: 50px;
+    height: 41px;
+    top: 3px;
+    left: 0;
+    max-width: 50px; /* Đặt kích thước tối đa */
+    max-height: 50px;
+    border-radius: 50%; /* Bo góc để tạo hình tròn */
+}

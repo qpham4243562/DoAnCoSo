@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DoAnCoSo.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="~/js/site.min.js" asp-append-version="true"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-orange">
@@ -19,8 +17,7 @@
             </a>
             <div class="d-flex align-items-center">
                 <form id="searchForm" class="form-inline ml-auto">
-                    <input class="form-control mr-sm-2" type="search" id="searchInput" placeholder="Nội dung tìm kiếm" aria-label="Search">
-                    
+                    <input class="form-control mr-sm-2" type="search" id="searchInput" placeholder="Nội dung tìm kiếm" aria-label="Search">                 
                 </form>
 
                 <ul class="navbar-nav ml-auto">
@@ -53,53 +50,11 @@
             @RenderBody()
         </main>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $('#userDropdown').click(function () {
-                $('#userDropdownMenu').toggle();
-            });
 
-            $(".logoutBtn").click(function () {
-                // Xóa cookie xác thực từ client-side
-                document.cookie = '.AspNetCore.Cookies=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/;';
-
-                // Chuyển hướng đến trang đăng nhập sau khi đăng xuất thành công
-                window.location.href = '/user/Login';
-            });
-
-            function getUnreadCount() {
-                // Thực hiện yêu cầu AJAX để lấy số lượng thông báo chưa đọc từ máy chủ
-                $.get("/Notification/GetUnreadCount", function (data) {
-                    // Cập nhật giá trị của phần tử <span> với số lượng thông báo chưa đọc
-                    $("#unreadCount").text(data);
-                });
-            }
-
-            // Gọi hàm để cập nhật số lượng thông báo chưa đọc khi trang được tải
-            getUnreadCount();
-
-            // Xử lý sự kiện click trên biểu tượng chuông để cập nhật lại số lượng thông báo chưa đọc
-            $(".nav-link").click(function () {
-                getUnreadCount();
-            });
-
-            document.getElementById("searchInput").addEventListener("keydown", function (event) {
-                if (event.key === "Enter") {
-                    var searchString = this.value.trim();
-                    if (searchString !== "") {
-                        // Thay đổi URL khi nhấn Enter
-                        window.location.href = "/UserPost/CombinedSearch?searchString=" + encodeURIComponent(searchString);
-                    }
-                    event.preventDefault(); // Ngăn chặn hành động mặc định của nút Enter
-                }
-            });
-        });
-    </script>
 </body>
 </html>
 

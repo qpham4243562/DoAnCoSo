@@ -470,7 +470,13 @@ namespace WebApplication2.Controllers
             }
 
             // Trả về kết quả tìm kiếm kết hợp
-            return View("CombinedSearch", new CombinedSearchResultsViewModel { Users = userSearchResults, Posts = postSearchResults });
+            var combinedResults = new List<CombinedSearchResultsViewModel>
+            {
+                new CombinedSearchResultsViewModel { Users = userSearchResults, Posts = postSearchResults }
+            };
+
+            // Trả về kết quả tìm kiếm kết hợp
+            return View("CombinedSearch", combinedResults);
         }
 
     }

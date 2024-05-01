@@ -1,4 +1,44 @@
-﻿$(".like-btn").click(function () {
+﻿$(document).ready(function () {
+    $('#userDropdown').click(function () {
+        $('#userDropdownMenu').toggle();
+    });
+
+    $(".logoutBtn").click(function () {
+        // Xóa cookie xác thực từ client-side
+        document.cookie = '.AspNetCore.Cookies=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/;';
+
+        // Chuyển hướng đến trang đăng nhập sau khi đăng xuất thành công
+        window.location.href = '/user/Login';
+    });
+
+    function getUnreadCount() {
+        // Thực hiện yêu cầu AJAX để lấy số lượng thông báo chưa đọc từ máy chủ
+        $.get("/Notification/GetUnreadCount", function (data) {
+            // Cập nhật giá trị của phần tử <span> với số lượng thông báo chưa đọc
+            $("#unreadCount").text(data);
+        });
+    }
+
+    // Gọi hàm để cập nhật số lượng thông báo chưa đọc khi trang được tải
+    getUnreadCount();
+
+    // Xử lý sự kiện click trên biểu tượng chuông để cập nhật lại số lượng thông báo chưa đọc
+    $(".nav-link").click(function () {
+        getUnreadCount();
+    });
+
+    document.getElementById("searchInput").addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            var searchString = this.value.trim();
+            if (searchString !== "") {
+                // Thay đổi URL khi nhấn Enter
+                window.location.href = "/UserPost/CombinedSearch?searchString=" + encodeURIComponent(searchString);
+            }
+            event.preventDefault(); // Ngăn chặn hành động mặc định của nút Enter
+        }
+    });
+});
+$(".like-btn").click(function () {
     var postid = $(this).data("postid");
     var likeCount = $("#likes-count-" + postid);
 
