@@ -381,6 +381,49 @@ namespace WebApplication2.Controllers
                 return View(new List<User_Post>()); // Trả về một danh sách trống hoặc xử lý theo nhu cầu của bạn
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> GetUserPosts(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID is required");
+            }
+
+            // Tìm người dùng trong cơ sở dữ liệu dựa trên userId
+            var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            // Kiểm tra user trước khi truy cập UserPosts
+            if (user.UserPosts != null)
+            {
+                // Lấy danh sách postId của người dùng
+                var postIds = user.UserPosts;
+
+                // Kiểm tra postIds trước khi truy vấn bài đăng
+                if (postIds != null && postIds.Any())
+                {
+                    // Tìm các bài đăng từ danh sách postId
+                    var userPosts = await _userPostCollection.Find(post => postIds.Contains(post.id)).ToListAsync();
+
+                    return View(userPosts);
+                }
+                else
+                {
+                    // Xử lý trường hợp postIds không tồn tại hoặc không có bài đăng nào
+                    return View(new List<User_Post>()); // Trả về một danh sách trống hoặc xử lý theo nhu cầu của bạn
+                }
+            }
+            else
+            {
+                // Xử lý trường hợp UserPosts không tồn tại
+                return View(new List<User_Post>()); // Trả về một danh sách trống hoặc xử lý theo nhu cầu của bạn
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> SavePost(string postId)
         {

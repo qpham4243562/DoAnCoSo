@@ -1,47 +1,8 @@
-﻿@using DoAnCoSoAPI.Entities
+﻿@using System.Security.Claims
 @model IEnumerable<DoAnCoSoAPI.Entities.User_Post>
 @{
-    ViewData["Title"] = "Index";
+    Layout = null;
 }
-<div class="container mt-4">
-    <div class="row">
-        <div class="col">
-            <div class="custom-select-container">
-                <form class="form-inline mb-3" asp-action="Index" method="get">
-                    <select class="custom-select mr-sm-2 dropdown-orange" id="selectedClass" name="selectedClass">
-                        <option value="">Chọn khối</option>
-                        @foreach (var c in Class.AllClasses)
-                        {
-                            <option value="@c.Name">@c.Name</option>
-                        }
-                    </select>
-
-                    <select class="custom-select mr-sm-2 dropdown-orange" id="selectedSubject" name="selectedSubject">
-                        <option value="">Chọn môn học</option>
-                        @foreach (var s in Subject.AllSubjects)
-                        {
-                            <option value="@s.Name">@s.Name</option>
-                        }
-                    </select>
-
-                    <button type="submit" class="btn btn-primary">Lọc</button>
-                </form>
-                <div class="d-flex align-items-center mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16" style="color:orange; padding: 10px 10px 10px 10px" title="">
-                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
-                    </svg>
-                    <form id="textForm" class="form-inline ml-2">
-                        <input type="text" id="textInput" placeholder="Nhập văn bản vào đây..." class="large-input">
-                    </form>
-                </div>
-                <div class="button-container">
-                    <a id="createQuestionButton" asp-controller="UserPost" asp-action="Create" class="button">Tạo câu hỏi</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 @foreach (var item in Model)
 {
     <br />
@@ -70,9 +31,7 @@
                                 <svg class="img" width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M18.5714 8.41155H12.1429V1.74311C12.1429 0.924833 11.5031 0.26123 10.7143 0.26123H9.28571C8.49687 0.26123 7.85714 0.924833 7.85714 1.74311V8.41155H1.42857C0.639732 8.41155 0 9.07515 0 9.89343V11.3753C0 12.1936 0.639732 12.8572 1.42857 12.8572H7.85714V19.5256C7.85714 20.3439 8.49687 21.0075 9.28571 21.0075H10.7143C11.5031 21.0075 12.1429 20.3439 12.1429 19.5256V12.8572H18.5714C19.3603 12.8572 20 12.1936 20 11.3753V9.89343C20 9.07515 19.3603 8.41155 18.5714 8.41155Z" fill="#FC8717" />
                                 </svg>
-                            </a>
-
-
+                            </a>        
                         </div>
                         <svg class="line" width="740" height="1" viewBox="0 0 740 1" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <line y1="0.5" x2="740" y2="0.5" stroke="#6D6D6D" stroke-opacity="0.6" />
@@ -134,5 +93,79 @@
             </div>
         </div>
     </div>
-
 }
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(".save-post-btn").click(function () {
+        var postId = $(this).data("postid");
+
+        // Gửi yêu cầu lưu bài đến server
+        $.ajax({
+            type: "POST",
+            url: "/UserPost/SavePost",
+            data: { postId: postId },
+            success: function (response) {
+                alert(response); // Hiển thị thông báo từ server
+            },
+            error: function (response) {
+                alert("response");
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        // Đoạn mã JavaScript của bạn ở đây
+        $(".zoomable-image").click(function () {
+            var img = $(this).clone();
+            showModal(img);
+        });
+
+        $(document).on("click", ".image-modal", function (e) {
+            if (e.target == this) {
+                hideModal();
+            }
+        });
+
+        let modal;
+        function showModal(img) {
+            if (!modal) {
+                modal = $("<div>", { "class": "image-modal" });
+                $("body").append(modal);
+            }
+
+            var modalContent = $("<img>", { "class": "image-modal-content", "src": img.attr("src") });
+            modal.html(modalContent);
+            modal.show();
+        }
+
+        function hideModal() {
+            if (modal) {
+                modal.hide();
+            }
+        }
+
+        const contentElements = document.querySelectorAll('.content-text');
+
+        contentElements.forEach(contentElement => {
+            const fullText = contentElement.dataset.fullText;
+            const truncatedText = contentElement.textContent;
+
+            if (fullText.length > 132) {
+                contentElement.classList.add('text-truncated');
+                contentElement.setAttribute('title', fullText); // Thêm title để hiển thị đoạn văn bản đầy đủ khi hover
+
+                contentElement.addEventListener('click', () => {
+                    if (contentElement.classList.contains('text-truncated')) {
+                        contentElement.textContent = fullText;
+                        contentElement.classList.remove('text-truncated');
+                    } else {
+                        contentElement.textContent = truncatedText;
+                        contentElement.classList.add('text-truncated');
+                    }
+                });
+            }
+        });
+    });
+</script>
+

@@ -1,9 +1,5 @@
 ﻿@using System.Security.Claims
 @model IEnumerable<DoAnCoSoAPI.Entities.User_Post>
-
-@{
-    ViewData["Title"] = "PersonalPage";
-}
 @{
     Layout = null;
 }
@@ -37,7 +33,24 @@
                                     </svg>
                                 </a>
 
-
+                            <div class="dropdown">
+                                <button class="dropbtn">
+                                    <svg class="arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1 5L8 12L15 5" stroke="#6D6D6D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
+                                <div class="dropdown-content">
+                                    @if (User.Identity.IsAuthenticated && item.CreatorId == User.FindFirst(ClaimTypes.NameIdentifier)?.Value)
+                                    {
+                                        <form id="deleteCommentForm-@item.id" method="post" action="/DeleteComment/@item.id">
+                                            <div>
+                                                @Html.ActionLink("Update", "Update", new { id = item.id })    
+                                            </div>
+                                        </form>
+                                    }
+                                    @Html.ActionLink("Delete", "Delete", new { id = item.id })
+                                </div>
+                            </div>
                             </div>
                             <svg class="line" width="740" height="1" viewBox="0 0 740 1" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <line y1="0.5" x2="740" y2="0.5" stroke="#6D6D6D" stroke-opacity="0.6" />
@@ -100,3 +113,78 @@
             </div>
         </div>
         }
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(".save-post-btn").click(function () {
+            var postId = $(this).data("postid");
+
+            // Gửi yêu cầu lưu bài đến server
+            $.ajax({
+                type: "POST",
+                url: "/UserPost/SavePost",
+                data: { postId: postId },
+                success: function (response) {
+                    alert(response); // Hiển thị thông báo từ server
+                },
+                error: function (response) {
+                    alert("response");
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Đoạn mã JavaScript của bạn ở đây
+            $(".zoomable-image").click(function () {
+                var img = $(this).clone();
+                showModal(img);
+            });
+
+            $(document).on("click", ".image-modal", function (e) {
+                if (e.target == this) {
+                    hideModal();
+                }
+            });
+
+            let modal;
+            function showModal(img) {
+                if (!modal) {
+                    modal = $("<div>", { "class": "image-modal" });
+                    $("body").append(modal);
+                }
+
+                var modalContent = $("<img>", { "class": "image-modal-content", "src": img.attr("src") });
+                modal.html(modalContent);
+                modal.show();
+            }
+
+            function hideModal() {
+                if (modal) {
+                    modal.hide();
+                }
+            }
+
+            const contentElements = document.querySelectorAll('.content-text');
+
+            contentElements.forEach(contentElement => {
+                const fullText = contentElement.dataset.fullText;
+                const truncatedText = contentElement.textContent;
+
+                if (fullText.length > 132) {
+                    contentElement.classList.add('text-truncated');
+                    contentElement.setAttribute('title', fullText); // Thêm title để hiển thị đoạn văn bản đầy đủ khi hover
+
+                    contentElement.addEventListener('click', () => {
+                        if (contentElement.classList.contains('text-truncated')) {
+                            contentElement.textContent = fullText;
+                            contentElement.classList.remove('text-truncated');
+                        } else {
+                            contentElement.textContent = truncatedText;
+                            contentElement.classList.add('text-truncated');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+

@@ -279,7 +279,7 @@ svg.bi-bell-fill {
         position: absolute;
         width: 90px;
         top: 0;
-        left: 20px;
+        left: 10px;
         font-family: "Inter-Light", Helvetica;
         font-weight: 300;
         color: #fc8717;
@@ -469,7 +469,6 @@ svg.bi-bell-fill {
     object-fit: cover; /* Giữ nguyên tỷ lệ khung hình và cắt phần tràn ra ngoài */
     margin-right: 10px;
 }
-
 .zoomable-image {
     cursor: pointer;
 }
@@ -526,4 +525,75 @@ svg.bi-bell-fill {
     max-width: 50px; /* Đặt kích thước tối đa */
     max-height: 50px;
     border-radius: 50%; /* Bo góc để tạo hình tròn */
+}
+
+
+
+/*Phần của trang cá nhân*/
+/* Dropdown button */
+.dropbtn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 100px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    right: 0;
+}
+
+    /* Links inside the dropdown */
+    .dropdown-content a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
+        /* Change color of dropdown links on hover */
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+    
+}
+
+/* Style the arrow inside the dropdown button */
+.arrow {
+    transform: rotate(0deg);
+    transition: transform 0.2s ease-out;
+    margin-left:100px;
+}
+
+/* Rotate the arrow when the dropdown is open */
+.dropdown:hover .arrow {
+    transform: rotate(180deg);
+}
+.user-info {
+    display: flex;
+    flex-direction: column; /* Hiển thị các phần tử con theo chiều dọc */
+    align-items: center; /* Căn giữa theo chiều ngang */
+    text-align: center; /* Căn giữa nội dung */
+}
+
+.user-details {
+    margin-top: 10px; /* Khoảng cách giữa hình ảnh và chi tiết người dùng */
+}
+.user-image {
+    max-width: 200px; /* Đặt độ rộng tối đa là 200px */
+    max-height: 200px; /* Đặt chiều cao tối đa là 200px */
+    width: auto; /* Chiều rộng tự động điều chỉnh để giữ tỷ lệ khung hình */
+    height: auto; /* Chiều cao tự động điều chỉnh để giữ tỷ lệ khung hình */
+    border-radius: 50%; /* Bo tròn hình ảnh */
+    overflow: hidden; /* Ẩn phần tràn ra ngoài của hình ảnh */
 }

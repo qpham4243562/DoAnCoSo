@@ -1,11 +1,5 @@
 ﻿@model DoAnCoSoAPI.Entities.User
 
-@{
-    ViewData["Title"] = "Index";
-    // Extension method
-   
-}
-
 <h1>Trang cá nhân</h1>
 
 <div class="user-info">
@@ -32,23 +26,21 @@
 <div id="personalPageContainer"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
-    // Tải nội dung của trang "PersonalPage" và render vào trong placeholder
-    loadPersonalPage();
+    $(document).ready(function () {
+        loadUserPosts(); // Load bài đăng của người dùng khi trang được tải
 
-    // Hàm để tải nội dung của trang "PersonalPage"
-    function loadPersonalPage() {
-        $.ajax({
-            url: '/UserPost/PersonalPage', // Đường dẫn tới trang "PersonalPage"
-            type: 'GET',
-            success: function(data) {
-                // Sau khi tải thành công, render nội dung vào placeholder
-                $('#personalPageContainer').html(data);
-            },
-            error: function() {
-                console.error('Failed to load PersonalPage.');
-            }
-        });
-    }
-});
+        function loadUserPosts() {
+            $.ajax({
+                url: '/UserPost/GetUserPosts', // Đường dẫn tới hàm lấy bài đăng của người dùng
+                type: 'GET',
+                data: { userId: '@Model.Id' }, // Truyền userId của người dùng
+                success: function (data) {
+                    $('#personalPageContainer').html(data); // Hiển thị kết quả vào #personalPageContainer
+                },
+                error: function () {
+                    console.error('Failed to load user posts.');
+                }
+            });
+        }
+    });
 </script>

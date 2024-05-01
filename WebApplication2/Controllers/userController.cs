@@ -221,6 +221,25 @@ namespace WebApplication2.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetUserById(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID cannot be null or empty");
+            }
+
+            // Tìm thông tin người dùng từ userId
+            var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            return View(user);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Search(string searchString)
         {
             List<User> searchResults;
@@ -257,8 +276,6 @@ namespace WebApplication2.Controllers
             }
 
             return View(searchResults);
-        }
-
-
+        }    
     }
 }

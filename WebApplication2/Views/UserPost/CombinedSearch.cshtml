@@ -1,6 +1,4 @@
 ﻿@model IEnumerable<WebApplication2.Models.CombinedSearchResultsViewModel>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="~/js/site.min.js" asp-append-version="true"></script>
 <h3>Users:</h3>
 @foreach (var item in Model)
 {
@@ -13,16 +11,18 @@
                     <div class="status">
                         @if (!string.IsNullOrEmpty(user.images?.ToString()))
                         {
-                            <img class="hinh" src="data:image/jpeg;base64,@Convert.ToBase64String(user.images)" />
+                            <img class="hinh zoomable-image" src="data:image/jpeg;base64,@Convert.ToBase64String(user.images)" />
                         }
                         else
                         {
-                            <img class="hinh" src="~/images/defaultAvatar.jpg" />
+                            <img class="hinh zoomable-image" src="~/images/defaultAvatar.jpg" />
                         }
                     </div>
                     <div class="user-info">
                         <p>@user.lastName @user.firstName</p>
                         <p>@user.eMail</p>
+                        <!-- Thêm nút "Trang cá nhân" với đường dẫn tương ứng -->
+                        <a href="@Url.Action("GetUserById", "user", new { userId = user.Id })">Trang cá nhân</a>
                     </div>
                 </div>
             }
@@ -133,5 +133,82 @@
     else
     {
         <p>No posts found.</p>
-    }
+    }   
+}
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(".save-post-btn").click(function () {
+            var postId = $(this).data("postid");
+
+            // Gửi yêu cầu lưu bài đến server
+            $.ajax({
+                type: "POST",
+                url: "/UserPost/SavePost",
+                data: { postId: postId },
+                success: function (response) {
+                    alert(response); // Hiển thị thông báo từ server
+                },
+                error: function (response) {
+                    alert("response");
+                }
+            });
+        }); 
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Đoạn mã JavaScript của bạn ở đây
+            $(".zoomable-image").click(function () {
+                var img = $(this).clone();
+                showModal(img);
+            });
+
+            $(document).on("click", ".image-modal", function (e) {
+                if (e.target == this) {
+                    hideModal();
+                }
+            });
+
+            let modal;
+            function showModal(img) {
+                if (!modal) {
+                    modal = $("<div>", { "class": "image-modal" });
+                    $("body").append(modal);
+                }
+
+                var modalContent = $("<img>", { "class": "image-modal-content", "src": img.attr("src") });
+                modal.html(modalContent);
+                modal.show();
+            }
+
+            function hideModal() {
+                if (modal) {
+                    modal.hide();
+                }
+            }
+
+            const contentElements = document.querySelectorAll('.content-text');
+
+            contentElements.forEach(contentElement => {
+                const fullText = contentElement.dataset.fullText;
+                const truncatedText = contentElement.textContent;
+
+                if (fullText.length > 132) {
+                    contentElement.classList.add('text-truncated');
+                    contentElement.setAttribute('title', fullText); // Thêm title để hiển thị đoạn văn bản đầy đủ khi hover
+
+                    contentElement.addEventListener('click', () => {
+                        if (contentElement.classList.contains('text-truncated')) {
+                            contentElement.textContent = fullText;
+                            contentElement.classList.remove('text-truncated');
+                        } else {
+                            contentElement.textContent = truncatedText;
+                            contentElement.classList.add('text-truncated');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 }
