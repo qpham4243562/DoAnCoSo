@@ -12,10 +12,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                @Html.DisplayNameFor(model => model.firstName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                @Html.DisplayNameFor(model => model.lastName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.images)
@@ -26,10 +26,10 @@
     <tbody>
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => modelItem.FirstName)
+                @Html.DisplayFor(modelItem => modelItem.firstName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => modelItem.LastName)
+                @Html.DisplayFor(modelItem => modelItem.lastName)
             </td>
             <td>
                 @if (Model.images.ToImages().Any())

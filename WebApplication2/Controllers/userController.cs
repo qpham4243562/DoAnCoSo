@@ -6,6 +6,7 @@ using MongoDB.Driver;
 using System.Security.Claims;
 using WebApplication2.Models;
 using DoAnCoSoAPI.Data;
+using MongoDB.Bson;
 
 namespace WebApplication2.Controllers
 {
@@ -33,7 +34,7 @@ namespace WebApplication2.Controllers
             }
 
             // Check if user with the same email already exists
-            var existingUser = await _userCollection.Find(u => u.Email == user.Email).FirstOrDefaultAsync();
+            var existingUser = await _userCollection.Find(u => u.eMail == user.eMail).FirstOrDefaultAsync();
             if (existingUser != null)
             {
                 return Conflict("User with this email already exists");
@@ -57,7 +58,7 @@ namespace WebApplication2.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginRequest loginRequest)
         {
-            var user = await _userCollection.Find(u => u.Email == loginRequest.Email).FirstOrDefaultAsync();
+            var user = await _userCollection.Find(u => u.eMail == loginRequest.eMail).FirstOrDefaultAsync();
             if (user == null)
             {
                 return NotFound("User not found");
@@ -78,7 +79,7 @@ namespace WebApplication2.Controllers
             var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, user.Id),
-        new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
+        new Claim(ClaimTypes.Name, $"{user.firstName} {user.lastName}")
         // Thêm các thông tin khác của người dùng nếu cần
     };
 
@@ -159,9 +160,9 @@ namespace WebApplication2.Controllers
             // Thực hiện cập nhật trong cơ sở dữ liệu
             var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
             var update = Builders<User>.Update
-                .Set(u => u.FirstName, updatedUser.FirstName)
-                .Set(u => u.LastName, updatedUser.LastName)
-                .Set(u => u.Email, updatedUser.Email)
+                .Set(u => u.firstName, updatedUser.firstName)
+                .Set(u => u.lastName, updatedUser.lastName)
+                .Set(u => u.eMail, updatedUser.eMail)
                 .Set(u => u.PasswordHash, updatedUser.PasswordHash);
 
             // Nếu có hình mới được tải lên, cập nhật cả hình ảnh
@@ -219,6 +220,44 @@ namespace WebApplication2.Controllers
             return View(user);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Search(string searchString)
+        {
+            List<User> searchResults;
+            var filterBuilder = Builders<User>.Filter;
+            var filters = new List<FilterDefinition<User>>();
+
+            // Phân tách chuỗi tìm kiếm thành các từ riêng biệt
+            var searchTerms = searchString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // Tạo bộ lọc cho mỗi từ tìm kiếm
+            foreach (var term in searchTerms)
+            {
+                var regexFilter = new BsonRegularExpression(term, "i");
+                var nameFilter = filterBuilder.Or(
+                    filterBuilder.Regex("firstName", regexFilter),
+                    filterBuilder.Regex("lastName", regexFilter),
+                    filterBuilder.Regex("eMail", regexFilter)
+                );
+                filters.Add(nameFilter);
+            }
+
+            // Kết hợp tất cả các bộ lọc
+            var combinedFilter = filterBuilder.And(filters);
+
+            try
+            {
+                // Thực hiện truy vấn với bộ lọc đã tạo
+                searchResults = await _userCollection.Find(combinedFilter).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred while searching: {ex.Message}");
+                searchResults = new List<User>();
+            }
+
+            return View(searchResults);
+        }
 
 
     }

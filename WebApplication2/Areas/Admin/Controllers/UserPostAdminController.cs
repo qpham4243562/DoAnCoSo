@@ -76,7 +76,7 @@ namespace WebApplication2.Areas.Admin.Controllers
             var creator = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
             if (creator != null)
             {
-                user_Post.CreatorName = $"{creator.LastName} {creator.FirstName}";
+                user_Post.CreatorName = $"{creator.lastName} {creator.firstName}";
             }
             else
             {

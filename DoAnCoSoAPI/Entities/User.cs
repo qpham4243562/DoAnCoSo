@@ -9,11 +9,11 @@ namespace DoAnCoSoAPI.Entities
         [BsonElement("_id"),BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
         [BsonElement("firstName"), BsonRepresentation(BsonType.String)]
-        public string? FirstName { get; set; }
+        public string? firstName { get; set; }
         [BsonElement("lastName"), BsonRepresentation(BsonType.String)]
-        public string? LastName { get; set; }
+        public string? lastName { get; set; }
         [BsonElement("eMail"), BsonRepresentation(BsonType.String)]
-        public string? Email { get; set; }
+        public string? eMail { get; set; }
         [BsonElement("passWordHash"), BsonRepresentation(BsonType.String)]
         public string? PasswordHash { get; set; }
         [BsonElement("registerAt"), BsonRepresentation(BsonType.DateTime)]

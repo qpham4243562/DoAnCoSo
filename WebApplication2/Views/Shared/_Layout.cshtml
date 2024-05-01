@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DoAnCoSo.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+    <script src="~/js/site.min.js" asp-append-version="true"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-orange">
@@ -26,10 +27,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="https://localhost:7222/Notification/GetNotifications">
                             <i class="bi bi-bell-fill" style="color: white;"></i>
-                            <span id="unreadCount" class="badge badge-danger">0</span>
+                                <span id="unreadCount" class="badge badge-danger">0</span>
                         </a>
                     </li>
-
                     <li class="nav-item">
                         <a class="nav-link" href="https://localhost:7231/"><i class="bi bi-chat-dots-fill" style="color: white;"></i></a>
                     </li>
@@ -93,7 +93,7 @@
                     var searchString = this.value.trim();
                     if (searchString !== "") {
                         // Thay đổi URL khi nhấn Enter
-                        window.location.href = "/UserPost/Search?searchString=" + encodeURIComponent(searchString);
+                        window.location.href = "/UserPost/CombinedSearch?searchString=" + encodeURIComponent(searchString);
                     }
                     event.preventDefault(); // Ngăn chặn hành động mặc định của nút Enter
                 }

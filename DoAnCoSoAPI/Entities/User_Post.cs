@@ -29,10 +29,12 @@ namespace DoAnCoSoAPI.Entities
         public DateTime? updatedAt { set; get; }
         public string CreatorId { get; set; }
         public string CreatorName { get; set; }
+        public byte[] CreatorAvatar { set; get; }
         [BsonElement("likes")]
         public int Likes { get; set; }
         [BsonElement("likedByUsers")]
         public List<string> LikedByUsers { get; set; } = new List<string>();
+        public int? count { get; set; }
         public List<User_comment> Comments { get; set; } // Thêm thuộc tính Comments
  
     }

@@ -81,19 +81,23 @@ namespace WebApplication2.Controllers
             // Insert data with images
             user_Post.createdAt = DateTime.Now;
             user_Post.Likes = 0;
+            user_Post.count = 0;
+
             // Add information about the creator
             var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             user_Post.CreatorId = userId;
             var creator = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
             if (creator != null)
             {
-                user_Post.CreatorName = $"{creator.LastName} {creator.FirstName}";
+                user_Post.CreatorName = $"{creator.lastName} {creator.firstName}";
+                user_Post.CreatorAvatar = creator.images; // Assuming 'Avatar' is the property storing the user's avatar image
             }
             else
             {
                 // Handle the case where creator information is not found
                 // For example: Set a default value or display an error message
                 user_Post.CreatorName = "Unknown";
+                user_Post.CreatorAvatar = null; // Set a default avatar image if necessary
             }
 
             // Save user post to the database
@@ -102,7 +106,6 @@ namespace WebApplication2.Controllers
             // Update the user's list of posts
             var updateDefinition = Builders<User>.Update.AddToSet(u => u.UserPosts, user_Post.id);
             var updateResult = await _userCollection.UpdateOneAsync(u => u.Id == userId && u.UserPosts != null, updateDefinition);
-
 
             return RedirectToAction("Index", "UserPost");
         }
@@ -420,7 +423,55 @@ namespace WebApplication2.Controllers
                 return Ok("Post already saved");
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> CombinedSearch(string searchString)
+        {
+            List<User> userSearchResults = new List<User>();
+            List<User_Post> postSearchResults = new List<User_Post>();
 
+            // Phân tách chuỗi tìm kiếm thành các từ riêng biệt
+            var searchTerms = searchString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // Tạo bộ lọc cho mỗi từ tìm kiếm
+            var filterBuilder = Builders<User>.Filter;
+            var userFilters = new List<FilterDefinition<User>>();
+            var postFilters = new List<FilterDefinition<User_Post>>();
+
+            foreach (var term in searchTerms)
+            {
+                var regexFilter = new BsonRegularExpression(term, "i");
+                var userFilter = filterBuilder.Or(
+                    filterBuilder.Regex("lastName", regexFilter),
+                    filterBuilder.Regex("firstName", regexFilter),
+                    filterBuilder.Regex("eMail", regexFilter)
+                );
+                userFilters.Add(userFilter);
+
+                var postFilter = Builders<User_Post>.Filter.Or(
+                    Builders<User_Post>.Filter.Regex("title", regexFilter),
+                    Builders<User_Post>.Filter.Regex("content", regexFilter)
+                );
+                postFilters.Add(postFilter);
+            }
+
+            // Kết hợp tất cả các bộ lọc
+            var combinedUserFilter = filterBuilder.And(userFilters);
+            var combinedPostFilter = Builders<User_Post>.Filter.Or(postFilters);
+
+            try
+            {
+                // Thực hiện truy vấn với bộ lọc đã tạo
+                userSearchResults = await _userCollection.Find(combinedUserFilter).ToListAsync();
+                postSearchResults = await _userPostCollection.Find(combinedPostFilter).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"An error occurred while searching: {ex.Message}");
+            }
+
+            // Trả về kết quả tìm kiếm kết hợp
+            return View("CombinedSearch", new CombinedSearchResultsViewModel { Users = userSearchResults, Posts = postSearchResults });
+        }
 
     }
 }

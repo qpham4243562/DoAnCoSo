@@ -28,7 +28,7 @@ namespace WebApplication2.Areas.Admin.Controllers
             }
 
             // Check if user with the same email already exists
-            var existingUser = await _userCollection.Find(u => u.Email == user.Email).FirstOrDefaultAsync();
+            var existingUser = await _userCollection.Find(u => u.eMail == user.eMail).FirstOrDefaultAsync();
             if (existingUser != null)
             {
                 return Conflict("User with this email already exists");
@@ -123,7 +123,7 @@ namespace WebApplication2.Areas.Admin.Controllers
             }
 
             Console.WriteLine("Searching for users with email containing the provided value.");
-            var usersFound = await _userCollection.Find(u => u.Email.Contains(email)).ToListAsync();
+            var usersFound = await _userCollection.Find(u => u.eMail.Contains(email)).ToListAsync();
             Console.WriteLine($"Found {usersFound.Count} users.");
 
             // Trả về view với danh sách người dùng tìm thấy
