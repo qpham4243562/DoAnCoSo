@@ -590,10 +590,8 @@ svg.bi-bell-fill {
     margin-top: 10px; /* Khoảng cách giữa hình ảnh và chi tiết người dùng */
 }
 .user-image {
-    max-width: 200px; /* Đặt độ rộng tối đa là 200px */
-    max-height: 200px; /* Đặt chiều cao tối đa là 200px */
-    width: auto; /* Chiều rộng tự động điều chỉnh để giữ tỷ lệ khung hình */
-    height: auto; /* Chiều cao tự động điều chỉnh để giữ tỷ lệ khung hình */
+    width: 200px; /* Đặt độ rộng là 200px */
+    height: 200px; /* Đặt chiều cao là 200px */
     border-radius: 50%; /* Bo tròn hình ảnh */
     overflow: hidden; /* Ẩn phần tràn ra ngoài của hình ảnh */
 }

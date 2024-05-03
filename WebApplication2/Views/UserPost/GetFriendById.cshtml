@@ -1,0 +1,37 @@
+﻿@model IEnumerable<WebApplication2.Models.FriendViewModel>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<h2>Danh sách bạn bè</h2>
+
+@if (Model.Any())
+{
+    <ul>
+        @foreach (var friend in Model)
+        {
+            <li>
+                <div>
+                    @if (friend.Friend.images.ToImages().Any())
+                    {
+                        <img class="hinh zoomable-image" src="data:image/jpeg;base64,@Convert.ToBase64String(friend.Friend.images.ToImages().First())" />
+                    }
+                    else
+                    {
+                        <img class="hinh zoomable-image" src="~/images/defaultAvatar.jpg" />
+                    }
+                    <span>@friend.Friend.firstName @friend.Friend.lastName</span>
+                    <span>Kết bạn từ: @friend.FriendSince.ToString("dd/MM/yyyy")</span>
+                    <a href="@Url.Action("GetUserById", "user", new { userId = friend.Friend.Id })">Trang cá nhân</a>                   
+                </div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Chưa có bạn bè nào.</p>
+}

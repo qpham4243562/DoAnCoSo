@@ -1,0 +1,77 @@
+﻿@model IEnumerable<WebApplication2.Models.FriendRequestViewModel>
+@{
+    Layout = null; // Nếu có layout
+}
+<h2>Lời mời kết bạn:</h2>
+@if (Model.Any())
+{
+    <ul>
+        @foreach (var request in Model)
+        {
+            <li>
+                <div>
+                    @if (!string.IsNullOrEmpty(request.Sender.images?.ToString()))
+                    {
+                        <img class="hinh zoomable-image" src="data:image/jpeg;base64,@Convert.ToBase64String(request.Sender.images)" />
+                    }
+                    else
+                    {
+                        <img class="hinh zoomable-image" src="~/images/defaultAvatar.jpg" />
+                    }
+                    <span>@request.Sender.firstName @request.Sender.lastName</span>
+                    <span>đã gữi lời kết bạn</span>
+                    <button class="accept-friend-request" data-request-id="@request.Id">Chấp nhận</button>
+                    <button class="reject-friend-request" data-request-id="@request.Id">Từ chối</button>
+                </div>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p>Không có lời mời kết bạn nào.</p>
+}
+
+    <script>
+        $(document).ready(function () {
+            $('.accept-friend-request').click(function () {
+                var requestId = $(this).data('request-id');
+                acceptFriendRequest(requestId);
+            });
+
+            $('.reject-friend-request').click(function () {
+                var requestId = $(this).data('request-id');
+                rejectFriendRequest(requestId);
+            });
+
+            function acceptFriendRequest(requestId) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("AcceptFriendRequest", "UserPost")',
+                    data: { requestId: requestId },
+                    success: function (response) {
+                        alert(response);
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Đã xảy ra lỗi: ' + error);
+                    }
+                });
+            }
+
+            function rejectFriendRequest(requestId) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("RejectFriendRequest", "UserPost")',
+                    data: { requestId: requestId },
+                    success: function (response) {
+                        alert(response);
+                        location.reload();
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Đã xảy ra lỗi: ' + error);
+                    }
+                });
+            }
+        });
+    </script>

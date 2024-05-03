@@ -1,4 +1,5 @@
-﻿@model IEnumerable<WebApplication2.Models.CombinedSearchResultsViewModel>
+﻿@using System.Security.Claims
+@model IEnumerable<WebApplication2.Models.CombinedSearchResultsViewModel>
 <h3>Users:</h3>
 @foreach (var item in Model)
 {
@@ -21,8 +22,14 @@
                     <div class="user-info">
                         <p>@user.lastName @user.firstName</p>
                         <p>@user.eMail</p>
-                        <!-- Thêm nút "Trang cá nhân" với đường dẫn tương ứng -->
-                        <a href="@Url.Action("GetUserById", "user", new { userId = user.Id })">Trang cá nhân</a>
+                        <a href="@Url.Action("GetUserById", "user", new { userId = user.Id })">Trang cá nhân</a> 
+                        @if (User.Identity.IsAuthenticated && @user.Id != User.FindFirst(ClaimTypes.NameIdentifier)?.Value)
+                        {
+                            @if (user.Id != ViewBag.CurrentUserId)
+                            {
+                                <button class="send-friend-request" data-receiver-id="@user.Id">Kết bạn</button>
+                            }          
+                        }
                     </div>
                 </div>
             }
@@ -133,7 +140,7 @@
     else
     {
         <p>No posts found.</p>
-    }   
+    }
 }
 
 @section Scripts {
@@ -154,7 +161,7 @@
                     alert("response");
                 }
             });
-        }); 
+        });
     </script>
     <script>
         $(document).ready(function () {
@@ -209,6 +216,26 @@
                     });
                 }
             });
+        });
+        $(document).ready(function () {
+            $('.send-friend-request').click(function () {
+                var receiverId = $(this).data('receiver-id');
+                sendFriendRequest(receiverId);
+            });
+
+            function sendFriendRequest(receiverId) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("SendFriendRequest", "UserPost")',
+                    data: { receiverId: receiverId },
+                    success: function (response) {
+                        alert(response);
+                    },
+                    error: function (xhr, status, error) {
+                        alert('Đã xảy ra lỗi: ' + error);
+                    }
+                });
+            }
         });
     </script>
 }

@@ -2,11 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Net.Http; // Use HttpClient from System.Net.Http
 using System.Security.Claims;
-using System.Threading.Tasks; // Use Task for asynchronous operations
 using WebApplication2.Models;
-
 namespace WebApplication2.Controllers
 {
     public class UserPostController : Controller
@@ -16,6 +13,7 @@ namespace WebApplication2.Controllers
         private readonly IMongoCollection<User> _userCollection;
         private readonly IMongoCollection<LikedPost> _likedPostCollection;
         private readonly IMongoCollection<Notification> _notificationCollection;
+        private readonly IMongoCollection<FriendRequest> _friendRequestCollection;
         public UserPostController(IMongoClient mongoClient)
         {
             // Thay thế "your_database_name" và "your_collection_name" với tên database và collection của bạn
@@ -23,6 +21,7 @@ namespace WebApplication2.Controllers
             _userCollection = mongoClient.GetDatabase("DoAn").GetCollection<User>("user");
             _likedPostCollection = mongoClient.GetDatabase("DoAn").GetCollection<LikedPost>("LikedPosts");
             _notificationCollection = mongoClient.GetDatabase("DoAn").GetCollection<Notification>("notification");
+            _friendRequestCollection = mongoClient.GetDatabase("DoAn").GetCollection<FriendRequest>("FriendRequest");
         }
         [HttpGet]
         public async Task<IActionResult> Index(string selectedClass, string selectedSubject)
@@ -521,6 +520,141 @@ namespace WebApplication2.Controllers
             // Trả về kết quả tìm kiếm kết hợp
             return View("CombinedSearch", combinedResults);
         }
+        [HttpPost]
+        public async Task<IActionResult> SendFriendRequest(string receiverId)
+        {
+            var senderId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Kiểm tra xem yêu cầu kết bạn đã tồn tại hay chưa
+            var existingRequest = await _friendRequestCollection.Find(fr => fr.SenderId == senderId && fr.ReceiverId == receiverId).FirstOrDefaultAsync();
+            if (existingRequest != null)
+            {
+                return BadRequest("Friend request already sent");
+            }
+
+            var friendRequest = new FriendRequest
+            {
+                SenderId = senderId,
+                ReceiverId = receiverId,
+                RequestedAt = DateTime.UtcNow,
+                IsAccepted = false
+            };
+
+            await _friendRequestCollection.InsertOneAsync(friendRequest);
+
+            return Ok("Friend request sent successfully");
+        }
+        [HttpGet]
+        public async Task<IActionResult> FriendRequests()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var friendRequests = (await _friendRequestCollection
+                .Find(fr => fr.ReceiverId == userId && !fr.IsAccepted)
+                .ToListAsync())
+                .Select(fr => new FriendRequestViewModel
+                {
+                    Id = fr.Id,
+                    SenderId = fr.SenderId
+                })
+                .ToList();
+
+            friendRequests = friendRequests
+                .SelectMany(fr =>
+                {
+                    var sender = _userCollection.Find(u => u.Id == fr.SenderId).FirstOrDefault();
+                    return new[] { new FriendRequestViewModel { Sender = sender, Id = fr.Id, SenderId = fr.SenderId } };
+                })
+                .ToList();
+
+            return View(friendRequests);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AcceptFriendRequest(string requestId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var friendRequest = await _friendRequestCollection.Find(fr => fr.Id == requestId && fr.ReceiverId == userId).FirstOrDefaultAsync();
+
+            if (friendRequest == null)
+            {
+                return NotFound("Friend request not found");
+            }
+
+            friendRequest.IsAccepted = true;
+            await _friendRequestCollection.ReplaceOneAsync(fr => fr.Id == requestId, friendRequest);
+
+            // Thêm các bước khác để lưu trữ mối quan hệ bạn bè vào cơ sở dữ liệu (nếu cần)
+
+            return Ok("Lời mời kết bạn đã được chấp nhận");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectFriendRequest(string requestId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var deleteResult = await _friendRequestCollection.DeleteOneAsync(fr => fr.Id == requestId && fr.ReceiverId == userId);
+
+            if (deleteResult.DeletedCount == 0)
+            {
+                return NotFound("Friend request not found");
+            }
+
+            return Ok("Lời mời kết bạn đã được từ chối");
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetFriends()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var friendViewModels = new List<FriendViewModel>();
+
+            var friendRequests = await _friendRequestCollection
+                .Find(fr => (fr.SenderId == userId || fr.ReceiverId == userId) && fr.IsAccepted)
+                .ToListAsync();
+
+            foreach (var friendRequest in friendRequests)
+            {
+                var friendId = friendRequest.SenderId == userId ? friendRequest.ReceiverId : friendRequest.SenderId;
+                var friend = await _userCollection.Find(u => u.Id == friendId).FirstOrDefaultAsync();
+                friendViewModels.Add(new FriendViewModel { Friend = friend, FriendSince = friendRequest.RequestedAt });
+            }
+
+            return View(friendViewModels);
+        }
+        [HttpPost]
+        public async Task<IActionResult> RemoveFriend(string friendId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            // Tìm và xóa lời mời kết bạn đã được chấp nhận giữa hai người dùng
+            var deletedFriendRequest = await _friendRequestCollection.DeleteOneAsync(fr =>
+                (fr.SenderId == userId && fr.ReceiverId == friendId || fr.SenderId == friendId && fr.ReceiverId == userId) &&
+                fr.IsAccepted);
+
+            if (deletedFriendRequest.DeletedCount == 0)
+            {
+                return NotFound("Friend relationship not found");
+            }
+
+            return Ok();
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetFriendById(string userId)
+        {
+            var friendViewModels = new List<FriendViewModel>();
+
+            var friendRequests = await _friendRequestCollection
+                .Find(fr => (fr.SenderId == userId || fr.ReceiverId == userId) && fr.IsAccepted)
+                .ToListAsync();
+
+            foreach (var friendRequest in friendRequests)
+            {
+                var friendId = friendRequest.SenderId == userId ? friendRequest.ReceiverId : friendRequest.SenderId;
+                var friend = await _userCollection.Find(u => u.Id == friendId).FirstOrDefaultAsync();
+                friendViewModels.Add(new FriendViewModel { Friend = friend, FriendSince = friendRequest.RequestedAt });
+            }
+
+            return View(friendViewModels);
+        }
+
 
     }
 }

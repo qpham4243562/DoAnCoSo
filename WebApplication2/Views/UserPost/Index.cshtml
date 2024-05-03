@@ -50,8 +50,7 @@
             <div class="overlap">
                 <div class="g-status">
                     <div class="overlap-group">
-                        <div class="status">
-                            @* <img class="vector" src="img/vector-6.svg" /> *@
+                        <div class="status">                       
                             @if (!string.IsNullOrEmpty(item.CreatorAvatar?.ToString()))
                             {
                                 <img class="vector zoomable-image" src="data:image/jpeg;base64,@Convert.ToBase64String(item.CreatorAvatar)" />
