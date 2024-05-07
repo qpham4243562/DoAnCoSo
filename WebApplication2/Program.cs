@@ -55,7 +55,7 @@ app.UseRouting();
 
 // Sử dụng CORS
 app.UseCors("AllowAll");
-
+app.UseAuthentication();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {

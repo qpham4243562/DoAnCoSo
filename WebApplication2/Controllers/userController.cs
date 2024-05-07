@@ -69,31 +69,31 @@ namespace WebApplication2.Controllers
             {
                 return Unauthorized("Invalid password");
             }
-            if (user.IsOnline == true)
-            {
-                return Unauthorized("Nguoi dung dang online");
-            }
+          
             user.LastLogin = DateTime.UtcNow;
             await _userCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
             // Tạo claim chứa thông tin của người dùng
             var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, user.Id),
-        new Claim(ClaimTypes.Name, $"{user.firstName} {user.lastName}")
+        new Claim(ClaimTypes.Name, $"{user.firstName} {user.lastName}"),
+        new Claim(ClaimTypes.Role, user.role)
         // Thêm các thông tin khác của người dùng nếu cần
     };
-
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
             // Kiểm tra và thêm vai trò của người dùng
             if (user.role == "admin")
             {
                 claims.Add(new Claim(ClaimTypes.Role, "admin"));
+                
                 return RedirectToAction("Index", "Home", new { area = "admin" });
             }
             // Tạo ClaimsIdentity từ danh sách claim
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+           
 
             // Tạo và đặt cookie xác thực
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+           
 
             // Chuyển hướng đến trang chính sau khi đăng nhập thành công
             return RedirectToAction("Index", "UserPost");
@@ -277,6 +277,6 @@ namespace WebApplication2.Controllers
 
             return View(searchResults);
         }
-      
+
     }
 }

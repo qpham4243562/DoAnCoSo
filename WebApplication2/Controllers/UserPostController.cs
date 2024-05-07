@@ -55,10 +55,53 @@ namespace WebApplication2.Controllers
         {
             return View();
         }
-
         [HttpPost]
-        public async Task<ActionResult> Create([FromForm] User_Post user_Post)
+        public async Task<IActionResult> Create([FromForm] User_Post user_Post)
         {
+            // Lấy userId từ cookie đăng nhập
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            // Kiểm tra xem userId có null hay không
+            if (string.IsNullOrEmpty(userId))
+            {
+                return BadRequest("User ID not found in cookie");
+            }
+
+            // Code khác đã có ở phần mã của bạn
+
+            // Tạo thông báo
+            var notificationContent = $"{HttpContext.User.Identity.Name} đã đăng một bài viết mới: {user_Post.title}";
+            var newPostNotification = new Notification
+            {
+                Content = notificationContent,
+                Type = "new_post",
+                PostId = user_Post.id,
+                CreatedAt = DateTime.Now,
+                IsRead = false
+            };
+
+            // Lấy danh sách bạn bè của người dùng hiện tại
+            var userFriends = await _friendRequestCollection
+                .Find(fr => (fr.SenderId == userId || fr.ReceiverId == userId) && fr.IsAccepted)
+                .ToListAsync();
+
+            // Gửi thông báo cho từng người bạn
+            foreach (var friend in userFriends)
+            {
+                // Kiểm tra xem bạn cần gửi thông báo cho người gửi hay người nhận của mỗi yêu cầu kết bạn
+                var friendId = friend.SenderId == userId ? friend.ReceiverId : friend.SenderId;
+
+                // Kiểm tra xem người bạn có tồn tại trong hệ thống không
+                var friendUser = await _userCollection.Find(u => u.Id == friendId).FirstOrDefaultAsync();
+                if (friendUser != null)
+                {
+                    // Gửi thông báo cho người bạn
+                    newPostNotification.UserId = friendId;
+                    await _notificationCollection.InsertOneAsync(newPostNotification);
+
+                    // Đoạn mã để gửi thông báo đến người bạn, ví dụ: gửi email, thông báo trực tiếp trong ứng dụng, vv.
+                }
+            }
             var files = HttpContext.Request.Form.Files;
 
             // Handle multiple images efficiently (up to a reasonable limit)
@@ -83,9 +126,9 @@ namespace WebApplication2.Controllers
             user_Post.count = 0;
 
             // Add information about the creator
-            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            user_Post.CreatorId = userId;
-            var creator = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+            var creatorId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Đã thay đổi tên biến thành creatorId
+            user_Post.CreatorId = creatorId;
+            var creator = await _userCollection.Find(u => u.Id == creatorId).FirstOrDefaultAsync();
             if (creator != null)
             {
                 user_Post.CreatorName = $"{creator.lastName} {creator.firstName}";
@@ -104,10 +147,11 @@ namespace WebApplication2.Controllers
 
             // Update the user's list of posts
             var updateDefinition = Builders<User>.Update.AddToSet(u => u.UserPosts, user_Post.id);
-            var updateResult = await _userCollection.UpdateOneAsync(u => u.Id == userId && u.UserPosts != null, updateDefinition);
+            var updateResult = await _userCollection.UpdateOneAsync(u => u.Id == creatorId && u.UserPosts != null, updateDefinition);
 
             return RedirectToAction("Index", "UserPost");
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Update(string id)
@@ -525,8 +569,11 @@ namespace WebApplication2.Controllers
         {
             var senderId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Kiểm tra xem yêu cầu kết bạn đã tồn tại hay chưa
-            var existingRequest = await _friendRequestCollection.Find(fr => fr.SenderId == senderId && fr.ReceiverId == receiverId).FirstOrDefaultAsync();
+            // Kiểm tra xem yêu cầu kết bạn đã tồn tại hay chưa (theo cả hai hướng)
+            var existingRequest = await _friendRequestCollection
+                .Find(fr => (fr.SenderId == senderId && fr.ReceiverId == receiverId) || (fr.SenderId == receiverId && fr.ReceiverId == senderId))
+                .FirstOrDefaultAsync();
+
             if (existingRequest != null)
             {
                 return BadRequest("Friend request already sent");
@@ -544,6 +591,7 @@ namespace WebApplication2.Controllers
 
             return Ok("Friend request sent successfully");
         }
+
         [HttpGet]
         public async Task<IActionResult> FriendRequests()
         {

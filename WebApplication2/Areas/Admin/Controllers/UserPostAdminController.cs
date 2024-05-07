@@ -1,5 +1,6 @@
 ﻿using DoAnCoSoAPI.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
 using System.Security.Claims;
 
@@ -12,16 +13,25 @@ namespace WebApplication2.Areas.Admin.Controllers
         private readonly IMongoCollection<User_Post> _userPostCollection;
         private readonly IMongoCollection<User> _userCollection;
         private readonly IMongoCollection<LikedPost> _likedPostCollection;
+        private readonly IMongoCollection<Notification> _notificationCollection;
         public UserPostAdminController(IMongoClient mongoClient)
         {
             // Thay thế "your_database_name" và "your_collection_name" với tên database và collection của bạn
             _userPostCollection = mongoClient.GetDatabase("DoAn").GetCollection<User_Post>("user_Post");
             _userCollection = mongoClient.GetDatabase("DoAn").GetCollection<User>("user");
             _likedPostCollection = mongoClient.GetDatabase("DoAn").GetCollection<LikedPost>("LikedPosts");
+            _notificationCollection = mongoClient.GetDatabase("DoAn").GetCollection<Notification>("notification");
         }
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user1 = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user1 == null || user1.role != "admin")
+            {
+                return BadRequest("Không phải Admin");
+            }
             List<User_Post> postList;
             try
             {
@@ -39,110 +49,16 @@ namespace WebApplication2.Areas.Admin.Controllers
 
             return View(postList);
         }
-
-        [HttpGet]
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> Create([FromForm] User_Post user_Post)
-        {
-            var files = HttpContext.Request.Form.Files;
-
-            // Handle multiple images efficiently (up to a reasonable limit)
-            if (files != null)
-            {
-                var imageCount = Math.Min(files.Count, 10); // Limit to 10 images (adjust as needed)
-
-                user_Post.images = new List<byte[]>(imageCount);
-                for (int i = 0; i < imageCount; i++)
-                {
-                    using (var ms = new MemoryStream())
-                    {
-                        await files[i].CopyToAsync(ms);
-                        user_Post.images.Add(ms.ToArray());
-                    }
-                }
-            }
-
-            // Insert data with images
-            user_Post.createdAt = DateTime.Now;
-            user_Post.Likes = 0;
-            // Add information about the creator
-            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            user_Post.CreatorId = userId;
-            var creator = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
-            if (creator != null)
-            {
-                user_Post.CreatorName = $"{creator.lastName} {creator.firstName}";
-            }
-            else
-            {
-                // Xử lý trường hợp không tìm thấy thông tin của người tạo
-                // Ví dụ: Gán giá trị mặc định hoặc thông báo lỗi
-                user_Post.CreatorName = "Unknown";
-            }
-
-            // Save user post to the database
-            await _userPostCollection.InsertOneAsync(user_Post);
-
-            return RedirectToAction("Index", "UserPost");
-        }
-        [HttpGet]
-        public async Task<IActionResult> Update(string id)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                return BadRequest("Invalid ID");
-            }
-
-            // Tìm bài đăng cần cập nhật trong cơ sở dữ liệu
-            var existingPost = await _userPostCollection.Find(post => post.id == id).FirstOrDefaultAsync();
-            if (existingPost == null)
-            {
-                return NotFound("Post not found");
-            }
-
-            return View(existingPost);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Update(string id, [FromForm] User_Post updatedPost)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                return BadRequest("Invalid ID");
-            }
-
-            // Kiểm tra xem bài đăng có tồn tại trong cơ sở dữ liệu không
-            var existingPost = await _userPostCollection.Find(post => post.id == id).FirstOrDefaultAsync();
-            if (existingPost == null)
-            {
-                return NotFound("Post not found");
-            }
-
-            // Cập nhật chỉ các thuộc tính được chỉ định
-            existingPost.title = updatedPost.title ?? existingPost.title;
-            existingPost.content = updatedPost.content ?? existingPost.content;
-            // Cập nhật ngày cập nhật
-            existingPost.updatedAt = DateTime.Now;
-
-            // Thực hiện cập nhật bài đăng trong cơ sở dữ liệu
-            var updatedResult = await _userPostCollection.ReplaceOneAsync(post => post.id == id, existingPost);
-
-            // Chuyển hướng về trang chủ hoặc trang danh sách bài đăng
-            return RedirectToAction("Index", "UserPost");
-        }
-
-
-
-
-
         [HttpGet]
         public async Task<IActionResult> Delete(string id)
         {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user1 = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user1 == null || user1.role != "admin")
+            {
+                return BadRequest("Không phải Admin");
+            }
             // Kiểm tra xem ID của bài đăng có hợp lệ hay không
             if (string.IsNullOrEmpty(id))
             {
@@ -157,13 +73,12 @@ namespace WebApplication2.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-
+           
             // Chuyển dữ liệu của bài đăng cần xóa sang view để hiển thị thông tin
             return View(postToDelete);
         }
 
         [HttpPost, ActionName("Delete")]
-        
         public async Task<ActionResult> DeleteConfirmed(string id)
         {
             // Kiểm tra xem ID của bài đăng có hợp lệ hay không
@@ -172,18 +87,60 @@ namespace WebApplication2.Areas.Admin.Controllers
                 return BadRequest();
             }
 
+            // Lấy thông tin của bài đăng cần xóa
+            var postToDelete = await _userPostCollection.Find(post => post.id == id).FirstOrDefaultAsync();
+
+            // Kiểm tra xem bài đăng có tồn tại hay không
+            if (postToDelete == null)
+            {
+                return NotFound();
+            }
+
             // Xóa bài đăng từ cơ sở dữ liệu
             var result = await _userPostCollection.DeleteOneAsync(post => post.id == id);
 
-            // Nếu không tìm thấy bài đăng để xóa, trả về NotFound
+            // Kiểm tra xem bài đăng đã được xóa thành công hay không
             if (result.DeletedCount == 0)
             {
                 return NotFound();
             }
 
+            // Gửi thông báo cho chủ sở hữu bài viết đã bị xóa
+            await SendNotificationToPostOwner(postToDelete);
+
             // Chuyển hướng về trang chủ hoặc trang danh sách bài đăng
             return RedirectToAction("Index", "UserPostAdmin");
         }
+
+        // Phương thức để gửi thông báo cho chủ sở hữu bài viết đã bị xóa
+        private async Task SendNotificationToPostOwner(User_Post deletedPost)
+        {
+            // Lấy thông tin của chủ sở hữu bài viết
+            var owner = await _userCollection.Find(u => u.Id == deletedPost.CreatorId).FirstOrDefaultAsync();
+
+            // Kiểm tra xem chủ sở hữu có tồn tại hay không
+            if (owner != null)
+            {
+                // Tạo nội dung thông báo
+                var notificationContent = $"Bài viết của bạn có tiêu đề '{deletedPost.title}' đã bị xóa do vi phạm nguyên tắc.";
+
+                // Tạo thông báo
+                var notification = new Notification
+                {
+                    Content = notificationContent,
+                    Type = "post_deleted",
+                    UserId = deletedPost.CreatorId, // Gửi thông báo cho chủ sở hữu bài viết
+                    CreatedAt = DateTime.Now,
+                    IsRead = false
+                };
+
+                // Lưu thông báo vào cơ sở dữ liệu
+                await _notificationCollection.InsertOneAsync(notification);
+
+                // Đoạn mã để gửi thông báo đến người dùng, ví dụ: gửi email, thông báo trực tiếp trong ứng dụng, v.v.
+            }
+        }
+
         [HttpGet("Admin/UserPostAdmin/Search")]
         public async Task<IActionResult> Search(string id)
         {

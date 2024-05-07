@@ -1,10 +1,14 @@
 ﻿using DoAnCoSoAPI.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
+using System.Security.Claims;
+using WebApplication2.Models;
 
 namespace WebApplication2.Areas.Admin.Controllers
 {
     [Area("admin")]
+
     public class userAdminController : Controller
     {
         private readonly IMongoCollection<User> _userCollection;
@@ -22,6 +26,13 @@ namespace WebApplication2.Areas.Admin.Controllers
         [HttpPost("Admin/userAdmin/Register")]
         public async Task<IActionResult> Register(User user)
         {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user1 = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user1 == null || user1.role != "admin")
+            {
+                return BadRequest("Không phải Admin");
+            }
             if (user == null)
             {
                 return BadRequest("Invalid user object");
@@ -45,16 +56,32 @@ namespace WebApplication2.Areas.Admin.Controllers
             return Redirect("/admin/userAdmin/Index");
         }
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            // Retrieve list of users from the database and pass it to the view
-            var users = _userCollection.Find(u => true).ToList();
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user == null || user.role != "admin")
+            {
+                return BadRequest("Không phải Admin");
+            }
+
+            var users = await _userCollection.Find(u => true).ToListAsync();
             return View(users);
         }
+
+
         [HttpGet("Admin/userAdmin/Edit/{id}")]
         public async Task<IActionResult> Edit(string id)
         {
             // Tìm người dùng theo id
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var admin = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (admin == null || admin.role != "admin")
+            {
+                return BadRequest("Không phải Admin");
+            }
             var user = await _userCollection.Find(u => u.Id == id).FirstOrDefaultAsync();
             if (user == null)
             {
@@ -87,6 +114,13 @@ namespace WebApplication2.Areas.Admin.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             // Tìm người dùng theo id và hiển thị trang xác nhận xóa
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var admin = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (admin == null || admin.role != "admin")
+            {
+                return BadRequest("Không phải Admin");
+            }
             var user = await _userCollection.Find(u => u.Id == id).FirstOrDefaultAsync();
             if (user == null)
             {
@@ -97,7 +131,13 @@ namespace WebApplication2.Areas.Admin.Controllers
 
         [HttpPost("Admin/userAdmin/Delete/{id}")]
         public async Task<IActionResult> DeleteConfirmed(string id)
-        {
+        {var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var admin = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (admin == null || admin.role != "admin")
+            {
+                return BadRequest("Không phải Admin");
+            }
             // Xóa người dùng từ database
             var result = await _userCollection.DeleteOneAsync(u => u.Id == id);
             if (result.IsAcknowledged && result.DeletedCount > 0)

@@ -12,19 +12,20 @@
     });
 
     function getUnreadCount() {
-        // Thực hiện yêu cầu AJAX để lấy số lượng thông báo chưa đọc từ máy chủ
-        $.get("/Notification/GetUnreadCount", function (data) {
-            // Cập nhật giá trị của phần tử <span> với số lượng thông báo chưa đọc
+        $.get("/Notification/GetTotalUnreadCount", function (data) {
             $("#unreadCount").text(data);
         });
     }
 
     // Gọi hàm để cập nhật số lượng thông báo chưa đọc khi trang được tải
-    getUnreadCount();
-
-    // Xử lý sự kiện click trên biểu tượng chuông để cập nhật lại số lượng thông báo chưa đọc
-    $(".nav-link").click(function () {
+    $(document).ready(function () {
+        // Cập nhật số lượng thông báo chưa đọc khi trang được tải
         getUnreadCount();
+
+        // Xử lý sự kiện click trên biểu tượng chuông để cập nhật lại số lượng thông báo chưa đọc
+        $(".nav-link .bi-bell-fill").click(function () {
+            getUnreadCount();
+        });
     });
 
     document.getElementById("searchInput").addEventListener("keydown", function (event) {
