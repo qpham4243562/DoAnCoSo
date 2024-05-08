@@ -1,14 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using MongoDB.Driver;
+using WebApplication2;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews()
+
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
+
+builder.Services.AddSignalR();
 
 builder.Services.AddHttpClient();
 
@@ -64,6 +69,12 @@ app.UseEndpoints(endpoints =>
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
     );
 });
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<ChatHub>("/chat");
+});
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=user}/{action=Login}/{id?}");
