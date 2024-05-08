@@ -6,8 +6,7 @@ using MongoDB.Driver;
 
 namespace DoAnCoSoAPI.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
+    
     public class UserController : ControllerBase
     {
         private readonly IMongoCollection<User>? _user;

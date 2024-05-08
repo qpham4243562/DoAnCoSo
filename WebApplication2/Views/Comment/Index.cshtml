@@ -35,6 +35,10 @@ else
 <button id="createCommentButton">Create</button>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    setTimeout(function () {
+        location.reload(true); // True để reload từ server, không cache
+    }, 15000); // 15 giây
+
     $(document).ready(function () {
         // Xử lý sự kiện khi nhấn Enter trong input
         $("#commentInput").keypress(function (event) {

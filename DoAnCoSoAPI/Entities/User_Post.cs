@@ -19,7 +19,10 @@ namespace DoAnCoSoAPI.Entities
         [BsonRepresentation(BsonType.Binary)]
 
         public List<byte[]>? images { set; get; }
-
+        [BsonElement("Class"), BsonRepresentation(BsonType.String)]
+        public string? Class { set; get; }
+        [BsonElement("Subject"), BsonRepresentation(BsonType.String)]
+        public string? Subject { set; get; }
         [BsonElement("createdAt"), BsonRepresentation(BsonType.DateTime)]
         public DateTime? createdAt { set; get; }
         [BsonElement("updatedAt"), BsonRepresentation(BsonType.DateTime)]
