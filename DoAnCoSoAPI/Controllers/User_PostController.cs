@@ -60,9 +60,9 @@ namespace DoAnCoSoAPI.Controllers
         {
             var filter = Builders<User_Post>.Filter.Eq(x => x.id, user_Post.id);
             //var update = Builders<User_Post>.Update
-            //    .Set(x => x.FirstName, user_Post.FirstName)
-            //    .Set(x => x.LastName, user_Post.LastName)
-            //   .Set(x => x.Email, user_Post.Email)
+            //    .Set(x => x.firstName, user_Post.firstName)
+            //    .Set(x => x.lastName, user_Post.lastName)
+            //   .Set(x => x.eMail, user_Post.eMail)
             //    .Set(x => x.Password, user_Post.PasswordHash)
             //    .Set(x => x.RegisterAt, user_Post.RegisterAt)
             //.Set(x => x.LastLogin, user_Post.LastLogin);

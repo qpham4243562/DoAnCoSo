@@ -1,9 +1,4 @@
 ﻿@model IEnumerable<DoAnCoSoAPI.Entities.Notification>
-
-@{
-    Layout = null;
-}
-
 <!DOCTYPE html>
 
 <html>
@@ -17,38 +12,38 @@
     <table class="table">
         <thead>
             <div>Số lượng thông báo chưa đọc: @ViewBag.UnreadCount</div>
-
-            <tr>
-
-                <th>
-                    @Html.DisplayNameFor(model => model.Content)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CreatedAt)
-                </th>
-                <th></th>
-            </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            <h2>Thông báo:</h2>
+            @if (Model.Any())
+            {
+                
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Content)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CreatedAt)
+                        </td>
+                        <td>
+                            <div class="notification-item">
+                                <button class="mark-as-read-btn" data-notification-id="@item.id">Đánh dấu đã đọc</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            else
             {
                 <tr>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Content)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CreatedAt)
-                    </td>
-                    <td>
-                        <div class="notification-item">
-                            <button class="mark-as-read-btn" data-notification-id="@item.id">Đánh dấu đã đọc</button>
-                        </div>
-                    </td>
+                    <td colspan="3">Không có thông báo nào.</td>
                 </tr>
             }
         </tbody>
     </table>
+    <div id="friendRequestContainer"></div>
     <script>
         $(document).ready(function () {
             $(".mark-as-read-btn").click(function () {
@@ -65,8 +60,23 @@
                     }
                 });
             });
+
+            loadFriendRequests();
+
+            function loadFriendRequests() {
+                $.ajax({
+                    url: '/UserPost/FriendRequests', // Đường dẫn tới trang "PersonalPage"
+                    type: 'GET',
+                    success: function (data) {
+                        // Sau khi tải thành công, render nội dung vào placeholder
+                        $('#friendRequestContainer').html(data);
+                    },
+                    error: function () {
+                        console.error('Failed to load FriendRequests.');
+                    }
+                });
+            }
         });
     </script>
-   
 </body>
 </html>

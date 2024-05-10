@@ -104,6 +104,8 @@ namespace WebApplication2.Controllers
                     post.Comments = new List<User_comment>();
                 }
                 post.Comments.Add(newComment);
+                // Tăng giá trị của thuộc tính count lên 1
+                post.count++;
                 var notification = new Notification
                 {
                     UserId = post.CreatorId, // Id của người đăng bài
@@ -171,7 +173,7 @@ namespace WebApplication2.Controllers
 
                 // Xóa comment khỏi danh sách comment
                 post.Comments.Remove(comment);
-
+                post.count--;
                 // Cập nhật bài viết trong cơ sở dữ liệu
                 await _userPostCollection.ReplaceOneAsync(p => p.id == postId, post);
 

@@ -1,47 +1,9 @@
-﻿@using DoAnCoSoAPI.Entities
+﻿@using System.Security.Claims
 @model IEnumerable<DoAnCoSoAPI.Entities.User_Post>
 @{
-    ViewData["Title"] = "Index";
+    Layout = null;
 }
-<div class="container mt-4">
-    <div class="row">
-        <div class="col">
-            <div class="custom-select-container">
-                <form class="form-inline mb-3" asp-action="Index" method="get">
-                    <select class="custom-select mr-sm-2 dropdown-orange" id="selectedClass" name="selectedClass">
-                        <option value="">Chọn khối</option>
-                        @foreach (var c in Class.AllClasses)
-                        {
-                            <option value="@c.Name">@c.Name</option>
-                        }
-                    </select>
-
-                    <select class="custom-select mr-sm-2 dropdown-orange" id="selectedSubject" name="selectedSubject">
-                        <option value="">Chọn môn học</option>
-                        @foreach (var s in Subject.AllSubjects)
-                        {
-                            <option value="@s.Name">@s.Name</option>
-                        }
-                    </select>
-
-                    <button type="submit" class="btn btn-primary">Lọc</button>
-                </form>
-                <div class="d-flex align-items-center mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16" style="color:orange; padding: 10px 10px 10px 10px" title="">
-                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
-                    </svg>
-                    <form id="textForm" class="form-inline ml-2">
-                        <input type="text" id="textInput" placeholder="Nhập văn bản vào đây..." class="large-input">
-                    </form>
-                </div>
-                <div class="button-container">
-                    <a id="createQuestionButton" asp-controller="UserPost" asp-action="Create" class="button">Tạo câu hỏi</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<h2>Posts:</h2>
 @foreach (var item in Model)
 {
     <br />
@@ -50,7 +12,7 @@
             <div class="overlap">
                 <div class="g-status">
                     <div class="overlap-group">
-                        <div class="status">                       
+                        <div class="status">
                             @if (!string.IsNullOrEmpty(item.CreatorAvatar?.ToString()))
                             {
                                 <img class="vector zoomable-image" src="data:image/jpeg;base64,@Convert.ToBase64String(item.CreatorAvatar)" />
@@ -59,6 +21,7 @@
                             {
                                 <img class="vector zoomable-image" src="~/images/defaultAvatar.jpg" />
                             }
+
                             <p class="NameAndTime">@Html.DisplayFor(modelItem => item.CreatorName)<br />@Html.DisplayFor(modelItem => item.createdAt)</p>
                         </div>
                         @* Nút theo dõi *@
@@ -71,7 +34,24 @@
                                 </svg>
                             </a>
 
-
+                            <div class="dropdown">
+                                <button class="dropbtn">
+                                    <svg class="arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1 5L8 12L15 5" stroke="#6D6D6D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
+                                <div class="dropdown-content">
+                                    @if (User.Identity.IsAuthenticated && item.CreatorId == User.FindFirst(ClaimTypes.NameIdentifier)?.Value)
+                                    {
+                                        <form id="deleteCommentForm-@item.id" method="post" action="/DeleteComment/@item.id">
+                                            <div>
+                                                @Html.ActionLink("Update", "Update", new { id = item.id })
+                                            </div>
+                                        </form>
+                                    }
+                                    @Html.ActionLink("Delete", "Delete", new { id = item.id })
+                                </div>
+                            </div>
                         </div>
                         <svg class="line" width="740" height="1" viewBox="0 0 740 1" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <line y1="0.5" x2="740" y2="0.5" stroke="#6D6D6D" stroke-opacity="0.6" />
@@ -79,13 +59,9 @@
                         <svg class="line2" width="740" height="2" viewBox="0 0 740 2" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <line y1="1.31348" x2="740" y2="1.31348" stroke="#6D6D6D" stroke-opacity="0.6" />
                         </svg>
-                    </div>                 
+                    </div>
                 </div>
-                
-
                 <div class="footer-post">
-                    
-
                     @* Nút like *@
                     <div class="like-container">
                         <svg class="vector-2 like-btn" width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg" data-postid="@item.id">
@@ -113,6 +89,7 @@
                         </a>
 
                     </div>
+                    <img class="line-2" src="img/line-2.svg" />
                 </div>
             </div>
             <div>
@@ -139,5 +116,79 @@
             </div>
         </div>
     </div>
-
 }
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(".save-post-btn").click(function () {
+        var postId = $(this).data("postid");
+
+        // Gửi yêu cầu lưu bài đến server
+        $.ajax({
+            type: "POST",
+            url: "/UserPost/SavePost",
+            data: { postId: postId },
+            success: function (response) {
+                alert(response); // Hiển thị thông báo từ server
+            },
+            error: function (response) {
+                alert("response");
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        // Đoạn mã JavaScript của bạn ở đây
+        $(".zoomable-image").click(function () {
+            var img = $(this).clone();
+            showModal(img);
+        });
+
+        $(document).on("click", ".image-modal", function (e) {
+            if (e.target == this) {
+                hideModal();
+            }
+        });
+
+        let modal;
+        function showModal(img) {
+            if (!modal) {
+                modal = $("<div>", { "class": "image-modal" });
+                $("body").append(modal);
+            }
+
+            var modalContent = $("<img>", { "class": "image-modal-content", "src": img.attr("src") });
+            modal.html(modalContent);
+            modal.show();
+        }
+
+        function hideModal() {
+            if (modal) {
+                modal.hide();
+            }
+        }
+
+        const contentElements = document.querySelectorAll('.content-text');
+
+        contentElements.forEach(contentElement => {
+            const fullText = contentElement.dataset.fullText;
+            const truncatedText = contentElement.textContent;
+
+            if (fullText.length > 132) {
+                contentElement.classList.add('text-truncated');
+                contentElement.setAttribute('title', fullText); // Thêm title để hiển thị đoạn văn bản đầy đủ khi hover
+
+                contentElement.addEventListener('click', () => {
+                    if (contentElement.classList.contains('text-truncated')) {
+                        contentElement.textContent = fullText;
+                        contentElement.classList.remove('text-truncated');
+                    } else {
+                        contentElement.textContent = truncatedText;
+                        contentElement.classList.add('text-truncated');
+                    }
+                });
+            }
+        });
+    });
+</script>
+

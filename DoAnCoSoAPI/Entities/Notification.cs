@@ -11,7 +11,9 @@ namespace DoAnCoSoAPI.Entities
         [BsonElement("UserId"), BsonRepresentation(BsonType.String)]
         public string UserId { get; set; }
         [BsonElement("Content"), BsonRepresentation(BsonType.String)]
+
         public string Content { get; set; }
+
         [BsonElement("Type"), BsonRepresentation(BsonType.String)]
         public string Type { get; set; }
         [BsonElement("PostId"), BsonRepresentation(BsonType.String)]

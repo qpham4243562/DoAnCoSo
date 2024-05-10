@@ -1,0 +1,182 @@
+﻿@using System.Security.Claims
+@model IEnumerable<DoAnCoSoAPI.Entities.User_Post>
+@{
+    Layout = null;
+}
+@if (Model.Any())
+{
+    @foreach (var item in Model)
+    {
+        <br />
+        <div class="box">
+            <div class="g-status">
+                <div class="overlap">
+                    <div class="g-status">
+                        <div class="overlap-group">
+                            <div class="status">
+                                @* <img class="vector" src="img/vector-6.svg" /> *@
+                                @if (!string.IsNullOrEmpty(item.CreatorAvatar?.ToString()))
+                                {
+                                    <img class="vector zoomable-image" src="data:image/jpeg;base64,@Convert.ToBase64String(item.CreatorAvatar)" />
+                                }
+                                else
+                                {
+                                    <img class="vector zoomable-image" src="~/images/defaultAvatar.jpg" />
+                                }
+                                <p class="NameAndTime">@Html.DisplayFor(modelItem => item.CreatorName)<br />@Html.DisplayFor(modelItem => item.createdAt)</p>
+                            </div>
+                            @* Nút theo dõi *@
+                            <div class="body-post-container"></div>
+                            <div class="theo-doi">
+                                <a class="save-post-btn" data-postid="@item.id">
+                                    <div class="text-wrapper">Theo dõi</div>
+                                    <svg class="img" width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18.5714 8.41155H12.1429V1.74311C12.1429 0.924833 11.5031 0.26123 10.7143 0.26123H9.28571C8.49687 0.26123 7.85714 0.924833 7.85714 1.74311V8.41155H1.42857C0.639732 8.41155 0 9.07515 0 9.89343V11.3753C0 12.1936 0.639732 12.8572 1.42857 12.8572H7.85714V19.5256C7.85714 20.3439 8.49687 21.0075 9.28571 21.0075H10.7143C11.5031 21.0075 12.1429 20.3439 12.1429 19.5256V12.8572H18.5714C19.3603 12.8572 20 12.1936 20 11.3753V9.89343C20 9.07515 19.3603 8.41155 18.5714 8.41155Z" fill="#FC8717" />
+                                    </svg>
+                                </a>
+                            </div>
+                            <svg class="line" width="740" height="1" viewBox="0 0 740 1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <line y1="0.5" x2="740" y2="0.5" stroke="#6D6D6D" stroke-opacity="0.6" />
+                            </svg>
+                            <svg class="line2" width="740" height="2" viewBox="0 0 740 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <line y1="1.31348" x2="740" y2="1.31348" stroke="#6D6D6D" stroke-opacity="0.6" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="footer-post">
+                        @* Nút like *@
+                        <div class="like-container">
+                            <svg class="vector-2 like-btn" width="30" height="32" viewBox="0 0 30 32" fill="none" xmlns="http://www.w3.org/2000/svg" data-postid="@item.id">
+                                <path d="M6.09375 14.1746H1.40625C0.62959 14.1746 0 14.8276 0 15.6333V30.2205C0 31.0261 0.62959 31.6792 1.40625 31.6792H6.09375C6.87041 31.6792 7.5 31.0261 7.5 30.2205V15.6333C7.5 14.8276 6.87041 14.1746 6.09375 14.1746ZM3.75 29.248C2.97334 29.248 2.34375 28.5949 2.34375 27.7893C2.34375 26.9837 2.97334 26.3306 3.75 26.3306C4.52666 26.3306 5.15625 26.9837 5.15625 27.7893C5.15625 28.5949 4.52666 29.248 3.75 29.248ZM22.5 5.51047C22.5 8.08852 20.9783 9.5346 20.5502 11.2571H26.5105C28.4674 11.2571 29.9908 12.9435 30 14.7883C30.0049 15.8786 29.5578 17.0523 28.861 17.7785L28.8545 17.7852C29.4308 19.2036 29.3371 21.1911 28.3091 22.6153C28.8178 24.1892 28.3051 26.1226 27.3492 27.1591C27.6011 28.2287 27.4807 29.139 26.989 29.8718C25.7931 31.6541 22.8291 31.6792 20.3226 31.6792L20.1559 31.6792C17.3266 31.6781 15.011 30.6095 13.1504 29.7509C12.2155 29.3194 10.993 28.7853 10.0654 28.7676C9.68221 28.7603 9.37501 28.4359 9.37501 28.0384V15.0454C9.37501 14.8509 9.45012 14.6643 9.58348 14.5275C11.9046 12.1483 12.9027 9.62942 14.8052 7.65261C15.6726 6.75112 15.9881 5.3894 16.2931 4.07254C16.5536 2.94805 17.0987 0.559814 18.2813 0.559814C19.6875 0.559814 22.5 1.04606 22.5 5.51047Z" fill="#FC8717" />
+                            </svg>
+                        </div>
+                        <div class="div" id="likes-count-@item.id">@item.Likes</div>
+                        @* Nút Comment *@
+
+                        <div class="text-wrapper-2" id="count-@item.id">@item.count</div>
+                        <a href="@Url.Action("Index", "Comment", new { postId = item.id })">
+                            <svg class="vector-4" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3.75 0H26.25C28.3184 0 30 1.68154 30 3.74978V20.6238C30 22.692 28.3184 24.3736 26.25 24.3736H20.625V29.2952C20.625 29.8693 19.9688 30.2033 19.5059 29.8635L12.1875 24.3736H3.75C1.68164 24.3736 0 22.692 0 20.6238V3.74978C0 1.68154 1.68164 0 3.75 0Z" fill="#FC8717" />
+                            </svg>
+                        </a>
+
+                        @* Nút Báo Cáo *@
+                        <div class="bao-cao">
+                            <div class="text-wrapper-3">Báo cáo</div>
+                            <a asp-controller="userReport" asp-action="Create" asp-route-postId="@item.id" class="vector-5 report-link">
+                                <svg width="25" height="26" viewBox="0 0 25 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12.1094 0.783691C5.42202 0.783691 0 6.41005 0 13.3449C0 20.2838 5.42202 25.9061 12.1094 25.9061C18.7967 25.9061 24.2188 20.2838 24.2188 13.3449C24.2188 6.41005 18.7967 0.783691 12.1094 0.783691ZM12.1094 6.3552C13.242 6.3552 14.1602 7.30762 14.1602 8.4825C14.1602 9.65738 13.242 10.6098 12.1094 10.6098C10.9768 10.6098 10.0586 9.65738 10.0586 8.4825C10.0586 7.30762 10.9768 6.3552 12.1094 6.3552ZM14.8438 19.2203C14.8438 19.556 14.5814 19.8281 14.2578 19.8281H9.96094C9.63735 19.8281 9.375 19.556 9.375 19.2203V18.0047C9.375 17.6691 9.63735 17.3969 9.96094 17.3969H10.5469V14.1553H9.96094C9.63735 14.1553 9.375 13.8832 9.375 13.5475V12.3319C9.375 11.9962 9.63735 11.7241 9.96094 11.7241H13.0859C13.4095 11.7241 13.6719 11.9962 13.6719 12.3319V17.3969H14.2578C14.5814 17.3969 14.8438 17.6691 14.8438 18.0047V19.2203Z" fill="#FC8717" />
+                                </svg>
+
+                            </a>
+
+                        </div>
+                        <img class="line-2" src="img/line-2.svg" />
+                    </div>
+                </div>
+                <div>
+                    <div class="container">
+                        <p class="ClassSubject">@Html.DisplayFor(modelItem => item.Class) @Html.DisplayFor(modelItem => item.Subject)</p>
+
+                        <div class="image-container">
+                            <div class="image-row">
+                                @if (item.images != null && item.images.Any())
+                                {
+                                    foreach (var image in item.images)
+                                    {
+                                        <img class="body-post zoomable-image" src="data:image/jpeg;base64,@Convert.ToBase64String(image)" />
+                                    }
+                                }
+                            </div>
+                        </div>
+                        <div class="container">
+                            <p class="p content-text" id="content-@item.id" data-full-text="@Html.DisplayFor(modelItem => item.content)">
+                                @(Html.DisplayFor(modelItem => item.content).ToString().Length > 132 ? Html.DisplayFor(modelItem => item.content).ToString().Substring(0, 132) + "..." : Html.DisplayFor(modelItem => item.content))
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>Chưa có bài viết nào.</p>
+}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(".save-post-btn").click(function () {
+        var postId = $(this).data("postid");
+
+        // Gửi yêu cầu lưu bài đến server
+        $.ajax({
+            type: "POST",
+            url: "/UserPost/SavePost",
+            data: { postId: postId },
+            success: function (response) {
+                alert(response); // Hiển thị thông báo từ server
+            },
+            error: function (response) {
+                alert("response");
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        // Đoạn mã JavaScript của bạn ở đây
+        $(".zoomable-image").click(function () {
+            var img = $(this).clone();
+            showModal(img);
+        });
+
+        $(document).on("click", ".image-modal", function (e) {
+            if (e.target == this) {
+                hideModal();
+            }
+        });
+
+        let modal;
+        function showModal(img) {
+            if (!modal) {
+                modal = $("<div>", { "class": "image-modal" });
+                $("body").append(modal);
+            }
+
+            var modalContent = $("<img>", { "class": "image-modal-content", "src": img.attr("src") });
+            modal.html(modalContent);
+            modal.show();
+        }
+
+        function hideModal() {
+            if (modal) {
+                modal.hide();
+            }
+        }
+
+        const contentElements = document.querySelectorAll('.content-text');
+
+        contentElements.forEach(contentElement => {
+            const fullText = contentElement.dataset.fullText;
+            const truncatedText = contentElement.textContent;
+
+            if (fullText.length > 132) {
+                contentElement.classList.add('text-truncated');
+                contentElement.setAttribute('title', fullText); // Thêm title để hiển thị đoạn văn bản đầy đủ khi hover
+
+                contentElement.addEventListener('click', () => {
+                    if (contentElement.classList.contains('text-truncated')) {
+                        contentElement.textContent = fullText;
+                        contentElement.classList.remove('text-truncated');
+                    } else {
+                        contentElement.textContent = truncatedText;
+                        contentElement.classList.add('text-truncated');
+                    }
+                });
+            }
+        });
+    });
+</script>
+

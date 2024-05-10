@@ -1,0 +1,61 @@
+﻿@model DoAnCoSoAPI.Entities.User
+
+<h1>Trang cá nhân</h1>
+
+<div class="user-info">
+    <div class="user-image">
+        @foreach (var image in Model.images.ToImages())
+        {
+            @if (Model.images.ToImages().Any())
+            {
+                <img class="user-image zoomable-image" src="data:image/jpeg;base64,@Convert.ToBase64String(image)">
+
+            }
+            else
+            {
+                <img class="user-image zoomable-image" src="~/images/defaultAvatar.jpg" />
+            }
+        }
+    </div>
+    <div class="user-details">
+        <span>@Html.DisplayFor(modelItem => modelItem.firstName)</span>
+        <span>@Html.DisplayFor(modelItem => modelItem.lastName)</span>
+    </div>
+</div>
+<div id="GetFriendByIdContainer"></div>
+<div id="personalPageContainer"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        loadUserPosts(); // Load bài đăng của người dùng khi trang được tải
+        loadFriendById(); // Load thông tin bạn bè của người dùng khi trang được tải
+    }); // Đóng sự kiện $(document).ready()
+
+    function loadUserPosts() {
+        $.ajax({
+            url: '/UserPost/GetUserPosts', // Đường dẫn tới hàm lấy bài đăng của người dùng
+            type: 'GET',
+            data: { userId: '@Model.Id' }, // Truyền userId của người dùng
+            success: function (data) {
+                $('#personalPageContainer').html(data); // Hiển thị kết quả vào #personalPageContainer
+            },
+            error: function () {
+                console.error('Failed to load user posts.');
+            }
+        });
+    }
+
+    function loadFriendById() {
+        $.ajax({
+            url: '/UserPost/GetFriendById', // Đường dẫn tới hàm lấy thông tin bạn bè của người dùng
+            type: 'GET',
+            data: { userId: '@Model.Id' }, // Truyền userId của người dùng
+            success: function (data) {
+                $('#GetFriendByIdContainer').html(data); // Hiển thị kết quả vào #GetFriendByIdContainer
+            },
+            error: function () {
+                console.error('Failed to load friend info.');
+            }
+        });
+    }
+</script>

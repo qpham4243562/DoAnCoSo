@@ -21,13 +21,13 @@
                 @Html.DisplayNameFor(model => model.Id)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                @Html.DisplayNameFor(model => model.firstName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                @Html.DisplayNameFor(model => model.lastName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                @Html.DisplayNameFor(model => model.eMail)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PasswordHash)
@@ -37,9 +37,6 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.LastLogin)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.images)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.role)
@@ -55,13 +52,13 @@
                     @Html.DisplayFor(modelItem => item.Id)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.FirstName)
+                    @Html.DisplayFor(modelItem => item.firstName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LastName)
+                    @Html.DisplayFor(modelItem => item.lastName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Email)
+                    @Html.DisplayFor(modelItem => item.eMail)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PasswordHash)
@@ -72,9 +69,7 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.LastLogin)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.images)
-                </td>
+
                 <td>
                     @Html.DisplayFor(modelItem => item.role)
                 </td>
@@ -84,6 +79,7 @@
                 </td>
             </tr>
         }
+
     </tbody>
 </table>
 <script>
