@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using WebApplication2.Models;
 
 namespace WebApplication2.Areas.Admin.Controllers
@@ -50,10 +52,26 @@ namespace WebApplication2.Areas.Admin.Controllers
 
             // You should hash the password before saving it to the database
             // For demonstration purposes, let's assume PasswordHash is already hashed
-            // user.PasswordHash = HashFunction(user.PasswordHash);
+            user.PasswordHash = HashPassword(user.PasswordHash);
 
             await _userCollection.InsertOneAsync(user);
             return Redirect("/admin/userAdmin/Index");
+        }
+        public static string HashPassword(string password)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                // Băm mật khẩu
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+                // Chuyển đổi byte array sang chuỗi hex
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }
         }
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -98,8 +116,16 @@ namespace WebApplication2.Areas.Admin.Controllers
                 return BadRequest();
             }
 
+            // Kiểm tra xem người dùng đã cung cấp mật khẩu mới hay không
+            if (!string.IsNullOrEmpty(user.PasswordHash))
+            {
+                // Băm mật khẩu mới
+                user.PasswordHash = HashPassword(user.PasswordHash);
+            }
+
             // Cập nhật thông tin người dùng
             var result = await _userCollection.ReplaceOneAsync(u => u.Id == id, user);
+
             if (result.IsAcknowledged && result.ModifiedCount > 0)
             {
                 return RedirectToAction("Index");
@@ -109,6 +135,7 @@ namespace WebApplication2.Areas.Admin.Controllers
                 return NotFound();
             }
         }
+
 
         [HttpGet("Admin/userAdmin/Delete/{id}")]
         public async Task<IActionResult> Delete(string id)

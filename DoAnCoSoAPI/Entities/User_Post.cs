@@ -5,7 +5,7 @@ using MongoDB.Driver.Core.Servers;
 
 namespace DoAnCoSoAPI.Entities
 {
-    public class User_Post
+     public class User_Post
     {
         [BsonId]
         [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
@@ -36,7 +36,7 @@ namespace DoAnCoSoAPI.Entities
         public List<string> LikedByUsers { get; set; } = new List<string>();
         public int? count { get; set; }
         public List<User_comment> Comments { get; set; } // Thêm thuộc tính Comments
- 
+        public bool IsApproved { get; set; } // True nếu bài viết đã được duyệt, false nếu chưa
     }
 
 }

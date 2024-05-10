@@ -126,3 +126,15 @@ contentElements.forEach(contentElement => {
         });
     }
 });
+const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+const emailInput = document.querySelector('input[asp-for="eMail"]');
+
+emailInput.addEventListener('blur', function () {
+    const email = emailInput.value.trim();
+
+    if (!emailRegex.test(email)) {
+        document.getElementById('email-error').textContent = 'Vui lòng nhập email hợp lệ.';
+    } else {
+        document.getElementById('email-error').textContent = ''; // Xóa thông báo lỗi nếu email hợp lệ
+    }
+});

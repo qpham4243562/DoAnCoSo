@@ -305,6 +305,14 @@ svg.bi-bell-fill {
         left: 0;
         object-fit: cover;
     }
+    .box .line2 {
+        top: 417px;
+        position: absolute;
+        width: 740px;
+        height: 2px;
+        left: 0;
+        object-fit: cover;
+    }
 
     .box .footer-post {
         position: absolute;
@@ -594,4 +602,93 @@ svg.bi-bell-fill {
     height: 200px; /* Đặt chiều cao là 200px */
     border-radius: 50%; /* Bo tròn hình ảnh */
     overflow: hidden; /* Ẩn phần tràn ra ngoài của hình ảnh */
+}
+/* Định dạng phần người dùng */
+.user-profiles-custom {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.user-profile-custom {
+    display: flex;
+    flex-direction: row; /* Thay đổi từ cột (column) sang hàng (row) */
+    align-items: center;
+    margin-bottom: 20px;
+    margin-left: 100px;
+    position: relative;
+}
+    .user-profile-custom .send-friend-request {
+        position: absolute;
+        right: 20px;
+        border: 2px solid #FC8717; /* Màu cam và độ dày viền */
+        border-radius: 20px; /* Độ cong của các góc */
+        padding: 10px 20px; /* Khoảng cách giữa viền và nội dung */
+        background-color: transparent; /* Màu nền trong suốt */
+        color: #FC8717; /* Màu chữ */
+        font-weight: bold; /* Độ đậm của chữ */
+        cursor: pointer; /* Bật chế độ con trỏ khi di chuột qua */
+        transition: all 0.3s ease; /* Hiệu ứng chuyển đổi màu khi hover */
+    }
+        .user-profile-custom .send-friend-request:hover {
+            background-color: #FC8717; /* Màu nền khi hover */
+            color: white; /* Màu chữ khi hover */
+        }
+
+.user-avatar-custom {
+    margin-right: 20px;
+}
+
+.user-details-custom {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: center;
+    margin-top: 10px;
+    
+}
+.user-info-custom {
+    margin-top: 10px; /* Điều chỉnh khoảng cách giữa hình ảnh và thông tin người dùng */
+}
+
+.user-image-custom {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+/* Định dạng hình ảnh người dùng */
+.user-avatar-custom img {
+    width: 50px;
+    height: 41px;
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 50%;
+}
+.user-profile-card {
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #fff;
+    margin-bottom: 10px;
+    width: 500px; /* Điều chỉnh kích thước của khung người dùng */
+    margin-left: 120px; /* Di chuyển khung sang phải */
+}
+.remove-friend {
+    position: absolute;
+    right: 975px;
+    border: 2px solid #FC8717; /* Màu cam và độ dày viền */
+    border-radius: 20px; /* Độ cong của các góc */
+    padding: 6px 14px; /* Khoảng cách giữa viền và nội dung */
+    background-color: transparent; /* Màu nền trong suốt */
+    color: #FC8717; /* Màu chữ */
+    font-weight: bold; /* Độ đậm của chữ */
+    cursor: pointer; /* Bật chế độ con trỏ khi di chuột qua */
+    transition: all 0.3s ease; /* Hiệu ứng chuyển đổi màu khi hover */
+}
+
+.remove-friend:hover {
+    background-color: #FC8717; /* Màu nền khi hover */
+    color: white; /* Màu chữ khi hover */
 }

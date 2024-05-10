@@ -7,6 +7,9 @@ using System.Security.Claims;
 using WebApplication2.Models;
 using DoAnCoSoAPI.Data;
 using MongoDB.Bson;
+using System.Text.RegularExpressions;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace WebApplication2.Controllers
 {
@@ -32,7 +35,22 @@ namespace WebApplication2.Controllers
             {
                 return BadRequest("Invalid user object");
             }
+            if (string.IsNullOrEmpty(user.firstName) || string.IsNullOrEmpty(user.lastName) ||
+            string.IsNullOrEmpty(user.eMail) || string.IsNullOrEmpty(user.PasswordHash))
+            {
+                return BadRequest("Vui lòng điền đầy đủ thông tin");
+            }
 
+            // Kiểm tra định dạng email, ví dụ: 
+            var emailRegex = new Regex(@"^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$");
+            if (!emailRegex.IsMatch(user.eMail))
+            {
+                return BadRequest("Định dạng email không hợp lệ");
+            }
+            if (user.PasswordHash.Length < 6)
+            {
+                return BadRequest("Mật khẩu phải có ít nhất 6 ký tự");
+            }
             // Check if user with the same email already exists
             var existingUser = await _userCollection.Find(u => u.eMail == user.eMail).FirstOrDefaultAsync();
             if (existingUser != null)
@@ -45,7 +63,7 @@ namespace WebApplication2.Controllers
 
             // You should hash the password before saving it to the database
             // For demonstration purposes, let's assume PasswordHash is already hashed
-            // user.PasswordHash = HashFunction(user.PasswordHash);
+            user.PasswordHash = HashPassword(user.PasswordHash);
 
             await _userCollection.InsertOneAsync(user);
             return Redirect("/user/Login");
@@ -65,11 +83,11 @@ namespace WebApplication2.Controllers
             }
 
             // Kiểm tra mật khẩu
-            if (loginRequest.Password != user.PasswordHash)
+            if (!VerifyPassword(loginRequest.Password, user.PasswordHash))
             {
                 return Unauthorized("Invalid password");
             }
-          
+
             user.LastLogin = DateTime.UtcNow;
             await _userCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
             // Tạo claim chứa thông tin của người dùng
@@ -98,7 +116,29 @@ namespace WebApplication2.Controllers
             // Chuyển hướng đến trang chính sau khi đăng nhập thành công
             return RedirectToAction("Index", "UserPost");
         }
+        public static string HashPassword(string password)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                // Băm mật khẩu
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
 
+                // Chuyển đổi byte array sang chuỗi hex
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+
+        public static bool VerifyPassword(string password, string hashedPassword)
+        {
+            // So sánh mật khẩu đã băm với mật khẩu nhập vào
+            string hashedInput = HashPassword(password);
+            return String.Equals(hashedInput, hashedPassword);
+        }
         [HttpPost("Logout")]
         public async Task<IActionResult> Logout()
         {

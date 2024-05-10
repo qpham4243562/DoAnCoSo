@@ -50,6 +50,59 @@ namespace WebApplication2.Areas.Admin.Controllers
             return View(postList);
         }
         [HttpGet]
+        public async Task<IActionResult> ApprovedPosts()
+        {
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user1 = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
+            if (user1 == null || user1.role != "admin")
+            {
+                return BadRequest("Không phải Admin");
+            }
+
+            List<User_Post> postList;
+            try
+            {
+                // Lấy tất cả các User_Post từ collection và sắp xếp theo thời gian tạo giảm dần
+                postList = await _userPostCollection.Find(post => !post.IsApproved)
+                                                     .SortByDescending(post => post.createdAt)
+                                                     .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                // Xử lý ngoại lệ khi truy vấn MongoDB
+                ModelState.AddModelError(string.Empty, $"An error occurred while fetching user posts from MongoDB: {ex.Message}");
+                postList = new List<User_Post>(); // Khởi tạo danh sách rỗng để tránh lỗi
+                                                  // Trả về một ActionResult hoặc một View để hiển thị thông báo lỗi cho người dùng
+                return View("Error"); // Ví dụ: trả về một view để hiển thị thông báo lỗi
+            }
+
+            // Trả về danh sách bài viết đã được duyệt
+            return View(postList);
+        }
+        [HttpPost]
+        public async Task<IActionResult> ApprovePost(string id)
+        {
+            // Lấy bài viết cần duyệt từ cơ sở dữ liệu
+            var postToApprove = await _userPostCollection.Find(post => post.id == id).FirstOrDefaultAsync();
+
+            // Kiểm tra xem bài viết có tồn tại hay không
+            if (postToApprove == null)
+            {
+                return NotFound();
+            }
+
+            // Đặt giá trị của trường IsApproved thành true để chỉ định bài viết đã được duyệt
+            postToApprove.IsApproved = true;
+
+            // Lưu thay đổi vào cơ sở dữ liệu
+            await _userPostCollection.ReplaceOneAsync(post => post.id == id, postToApprove);
+
+            // Chuyển hướng hoặc thực hiện hành động khác sau khi duyệt bài viết
+            return RedirectToAction("PendingPosts");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Delete(string id)
         {
             var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

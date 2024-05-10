@@ -5,36 +5,48 @@
 {
     @if (item.Users.Any())
     {
-        <div class="user-profiles">
-            @foreach (var user in item.Users)
-            {
-                <div class="user-profile">
-                    <div class="status">
-                        @if (!string.IsNullOrEmpty(user.images?.ToString()))
-                        {
-                            <img class="hinh zoomable-image" src="data:image/jpeg;base64,@Convert.ToBase64String(user.images)" />
-                        }
-                        else
-                        {
-                            <img class="hinh zoomable-image" src="~/images/defaultAvatar.jpg" />
-                        }
+        <div class="user-profiles-container">
+            <div class="user-profiles-custom">
+                @foreach (var user in item.Users)
+                {
+                    <div class="user-profile-card">
+                        <div class="user-profile-custom">
+                            <div class="user-avatar-custom">
+                                <div class="status">
+                                    @if (!string.IsNullOrEmpty(user.images?.ToString()))
+                                    {
+                                        <img class="user-avatar-image" src="data:image/jpeg;base64,@Convert.ToBase64String(user.images)" />
+                                    }
+                                    else
+                                    {
+                                        <img class="user-avatar-image" src="~/images/defaultAvatar.jpg" />
+                                    }
+                                </div>
+                            </div>
+                            <div class="user-details-custom">
+                                <div class="user-info-custom">
+                                    <a href="@Url.Action("GetUserById", "user", new { userId = user.Id })" style="text-decoration: none; color: black;">
+                                        <p><strong style="font-size: 20px;">@user.lastName @user.firstName</strong></p>
+                                    </a>
+
+                                    <p>@user.eMail</p>
+                                </div>
+                                @if (User.Identity.IsAuthenticated && @user.Id != User.FindFirst(ClaimTypes.NameIdentifier)?.Value)
+                                {
+                                    @if (user.Id != ViewBag.CurrentUserId)
+                                    {
+                                        <button class="send-friend-request" data-receiver-id="@user.Id">Kết bạn</button>
+                                    }
+                                }
+                            </div>
+                        </div>
                     </div>
-                    <div class="user-info">
-                        <p>@user.lastName @user.firstName</p>
-                        <p>@user.eMail</p>
-                        <a href="@Url.Action("GetUserById", "user", new { userId = user.Id })">Trang cá nhân</a> 
-                        @if (User.Identity.IsAuthenticated && @user.Id != User.FindFirst(ClaimTypes.NameIdentifier)?.Value)
-                        {
-                            @if (user.Id != ViewBag.CurrentUserId)
-                            {
-                                <button class="send-friend-request" data-receiver-id="@user.Id">Kết bạn</button>
-                            }          
-                        }
-                    </div>
-                </div>
-            }
+                   
+                }
+            </div>
         </div>
     }
+
     else
     {
         <p>No users found.</p>
@@ -76,6 +88,9 @@
                                 </div>
                                 <svg class="line" width="740" height="1" viewBox="0 0 740 1" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <line y1="0.5" x2="740" y2="0.5" stroke="#6D6D6D" stroke-opacity="0.6" />
+                                </svg>
+                                <svg class="line2" width="740" height="2" viewBox="0 0 740 2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <line y1="1.31348" x2="740" y2="1.31348" stroke="#6D6D6D" stroke-opacity="0.6" />
                                 </svg>
                             </div>
                         </div>
@@ -229,13 +244,18 @@
                     url: '@Url.Action("SendFriendRequest", "UserPost")',
                     data: { receiverId: receiverId },
                     success: function (response) {
-                        alert(response);
+                        console.log(response); // In response ra console
+                        alert(response); // Hiển thị response trong một cửa sổ alert
+
+                        // Thực hiện các hành động khác dựa trên response ở đây
                     },
-                    error: function (xhr, status, error) {
-                        alert('Đã xảy ra lỗi: ' + error);
+                    error: function (response) {
+                        alert(response);
                     }
                 });
             }
+
         });
+
     </script>
 }

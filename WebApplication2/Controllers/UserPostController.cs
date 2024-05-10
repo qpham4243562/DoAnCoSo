@@ -29,6 +29,9 @@ namespace WebApplication2.Controllers
             List<User_Post> postList;
             var filter = Builders<User_Post>.Filter.Empty;
 
+            // Thêm điều kiện để chỉ lấy những bài viết được phê duyệt
+            filter &= Builders<User_Post>.Filter.Eq(p => p.IsApproved, true);
+
             if (!string.IsNullOrEmpty(selectedClass))
                 filter &= Builders<User_Post>.Filter.Eq(p => p.Class, selectedClass);
 
@@ -49,6 +52,7 @@ namespace WebApplication2.Controllers
 
             return View(postList);
         }
+
 
         [HttpGet]
         public IActionResult Create()
@@ -124,6 +128,7 @@ namespace WebApplication2.Controllers
             user_Post.createdAt = DateTime.Now;
             user_Post.Likes = 0;
             user_Post.count = 0;
+            user_Post.IsApproved = false;
 
             // Add information about the creator
             var creatorId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Đã thay đổi tên biến thành creatorId
@@ -576,7 +581,7 @@ namespace WebApplication2.Controllers
 
             if (existingRequest != null)
             {
-                return BadRequest("Friend request already sent");
+                return Ok("Friend request already sent");
             }
 
             var friendRequest = new FriendRequest
