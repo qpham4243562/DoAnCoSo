@@ -4,7 +4,14 @@
 @{
     ViewData["Title"] = "Create";
 }
-
+<style>
+    .large-input {
+        width: 100%;
+        height: 200px;
+        padding: 10px; /* Tùy chọn: thêm khoảng cách bên trong khung nhập liệu */
+        font-size: 16px; /* Tùy chọn: điều chỉnh kích thước chữ */
+    }
+</style>
 <h1 class="title-h1">ĐĂNG BÀI</h1>
 <div class="row">
     <div class="col-md-3"></div>
@@ -13,7 +20,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group form-setting">
                 <label asp-for="content" class="control-label">Nội dung</label>
-                <input asp-for="content" class="form-control" />
+                <input asp-for="content" placeholder="Nhập văn bản vào đây..." class="form-control large-input" />
                 <span asp-validation-for="content" class="text-danger"></span>
             </div>
             <div class="form-group form-setting">
@@ -21,6 +28,7 @@
                 <input type="file" name="images" class="form-control" multiple />
                 <span asp-validation-for="images" class="text-danger"></span>
             </div>
+            <br>
             <div class="row">
                 <div class="col-md-5 form-group form-setting">
                     <select asp-for="Class" class="custom-select mr-sm-2 dropdown-orange">
@@ -41,10 +49,11 @@
                             <option value="@s.Name">@s.Name</option>
                         }
                     </select>
+
                     <span asp-validation-for="Subject" class="text-danger"></span>
                 </div>
             </div>
-
+            <br>
             <div class="form-group form-setting">
                 <input type="submit" value="Đăng bài" class="button" />
             </div>

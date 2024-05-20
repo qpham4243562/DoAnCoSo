@@ -57,7 +57,6 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
 // Sử dụng CORS
 app.UseCors("AllowAll");
 app.UseAuthentication();

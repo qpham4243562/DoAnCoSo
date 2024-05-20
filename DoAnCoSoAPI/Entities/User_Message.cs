@@ -9,12 +9,13 @@ namespace DoAnCoSoAPI.Entities
         [BsonId]
         [BsonElement("_id"), BsonRepresentation(BsonType.ObjectId)]
         public string? id { set; get; }
+        [BsonElement("user_name"), BsonRepresentation(BsonType.String)]
       
+        public string? user_name { set; get; }
         [BsonElement("message"), BsonRepresentation(BsonType.String)]
         public string? message { set; get; }
         [BsonElement("createdAt"), BsonRepresentation(BsonType.DateTime)]
         public DateTime? createdAt { set; get; }
-        [BsonElement("updatedAt"), BsonRepresentation(BsonType.DateTime)]
-        public DateTime? updatedAt { set; get; }
+       
     }
 }

@@ -1,6 +1,60 @@
 ﻿@using System.Security.Claims
 @model IEnumerable<DoAnCoSoAPI.Entities.User_comment>
+<style>
+    .user-profile-custom {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 20px;
+        margin-left: 100px;
+        position: relative;
+    }
 
+        .user-profile-custom .send-friend-request,
+        #createCommentButton {
+            border: 2px solid #FC8717;
+            border-radius: 20px;
+            padding: 8px 16px;
+            background-color: transparent;
+            color: #FC8717;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0; /* Ngăn không cho nút co lại */
+        }
+
+            .user-profile-custom .send-friend-request:hover,
+            #createCommentButton:hover {
+                background-color: #FC8717;
+                color: white;
+            }
+
+    /* Styles for input and button */
+    #commentInput {
+        flex-grow: 1;
+        padding: 8px;
+        margin-right: 5px;
+        box-sizing: border-box;
+        min-width: 0; /* Cho phép co lại khi cần thiết */
+    }
+
+    /* Container for input and button */
+    .comment-input-container {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap; /* Ngăn chặn xuống dòng */
+    }
+    #commentInput, #createCommentButton {
+        min-width: 0; /* Cho phép co lại khi cần thiết */
+    }
+
+    #createCommentButton {
+        white-space: nowrap; /* Prevent button text from wrapping */
+    }
+</style>
 <h2>Comments</h2>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 @if (Model != null && Model.Any())
@@ -31,8 +85,10 @@ else
 {
     <p>No comments found.</p>
 }
-<input type="text" id="commentInput" placeholder="Type your comment here..." />
-<button id="createCommentButton">Create</button>
+<div class="comment-input-container">
+    <input type="text" id="commentInput" placeholder="Type your comment here..." />
+    <button id="createCommentButton">Create</button>
+</div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     setTimeout(function () {

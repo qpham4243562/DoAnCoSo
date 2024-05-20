@@ -64,7 +64,7 @@ namespace WebApplication2.Controllers
             // You should hash the password before saving it to the database
             // For demonstration purposes, let's assume PasswordHash is already hashed
             user.PasswordHash = HashPassword(user.PasswordHash);
-
+            user.images = [];
             await _userCollection.InsertOneAsync(user);
             return Redirect("/user/Login");
         }
@@ -90,32 +90,33 @@ namespace WebApplication2.Controllers
 
             user.LastLogin = DateTime.UtcNow;
             await _userCollection.ReplaceOneAsync(u => u.Id == user.Id, user);
+
             // Tạo claim chứa thông tin của người dùng
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id),
-        new Claim(ClaimTypes.Name, $"{user.firstName} {user.lastName}"),
-        new Claim(ClaimTypes.Role, user.role)
-        // Thêm các thông tin khác của người dùng nếu cần
-    };
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, $"{user.firstName} {user.lastName}"),
+                    new Claim(ClaimTypes.Role, user.role)
+                    // Thêm các thông tin khác của người dùng nếu cần
+                };
+
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+            // Đặt cookie UserName chứa tên người dùng vào response
+            Response.Cookies.Append("UserName", $"{user.firstName} {user.lastName}");
+
             // Kiểm tra và thêm vai trò của người dùng
             if (user.role == "admin")
             {
                 claims.Add(new Claim(ClaimTypes.Role, "admin"));
-                
                 return RedirectToAction("Index", "Home", new { area = "admin" });
             }
-            // Tạo ClaimsIdentity từ danh sách claim
-           
-
-            // Tạo và đặt cookie xác thực
-           
 
             // Chuyển hướng đến trang chính sau khi đăng nhập thành công
             return RedirectToAction("Index", "UserPost");
         }
+
         public static string HashPassword(string password)
         {
             using (SHA256 sha256Hash = SHA256.Create())
@@ -174,6 +175,9 @@ namespace WebApplication2.Controllers
                 return BadRequest("User id not found in cookie");
             }
 
+            // Lấy thông tin người dùng hiện tại từ cơ sở dữ liệu
+            var currentUser = await _userCollection.Find(u => u.Id == userId).FirstOrDefaultAsync();
+
             // Kiểm tra xem có hình nào được tải lên hay không
             if (images != null && images.Count > 0)
             {
@@ -193,9 +197,14 @@ namespace WebApplication2.Controllers
 
             // Đảm bảo rằng bạn đã cập nhật tất cả các trường dữ liệu khác của đối tượng người dùng
             // ở đây trước khi thực hiện cập nhật trong cơ sở dữ liệu
-
             // Xóa trường _id từ đối tượng updatedUser
             updatedUser.Id = null;
+
+            // Nếu mật khẩu không được thay đổi, giữ nguyên mật khẩu hiện tại
+            if (string.IsNullOrEmpty(updatedUser.PasswordHash))
+            {
+                updatedUser.PasswordHash = currentUser.PasswordHash;
+            }
 
             // Thực hiện cập nhật trong cơ sở dữ liệu
             var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
@@ -212,7 +221,6 @@ namespace WebApplication2.Controllers
             }
 
             var result = await _userCollection.UpdateOneAsync(filter, update);
-
             if (result.IsAcknowledged && result.ModifiedCount > 0)
             {
                 return RedirectToAction("Update", "user");
