@@ -6,58 +6,52 @@
 
 <h1>Delete</h1>
 
-<h3>Are you sure you want to delete this?</h3>
+<h3>Bạn có muốn xóa tài khoản này?</h3>
 <div>
-    <h4>User</h4>
+    
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Id)
+            ID:
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Id)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstName)
+            @Html.DisplayNameFor(model => model.firstName)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.FirstName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastName)
+            @Html.DisplayNameFor(model => model.lastName)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.LastName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
+            @Html.DisplayNameFor(model => model.eMail)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Email)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PasswordHash)
+            Password:
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.PasswordHash)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RegisterAt)
+            Register_At:
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.RegisterAt)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.LastLogin)
+            Last_Login:
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.LastLogin)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.images)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.images)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.role)

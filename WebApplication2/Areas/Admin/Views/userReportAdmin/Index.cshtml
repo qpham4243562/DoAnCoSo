@@ -4,28 +4,20 @@
     ViewData["Title"] = "Index";
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<div>
-    <input id="postIdInput" class="form-control" type="text" placeholder="Enter post ID..." aria-label="Enter post ID...">
-    <button class="btn btn-primary" id="searchButton" type="button">Search</button>
-</div>
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<h1>Danh sách báo cáo</h1>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.id)
+                ID_Report
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PostId)
+                ID_Post
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Reason)
+                Reason
             </th>
-            <th></th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>

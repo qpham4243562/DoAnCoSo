@@ -5,14 +5,13 @@
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <div class="input-group">
-    <input id="searchInput" class="form-control searchInput" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+    <input id="searchInput" class="form-control searchInput" type="text" placeholder="Search for email..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
     <button class="btn btn-primary btnNavbarSearch" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i> Search</button>
 </div>
 
-
-<h1>Index</h1>
+<h1>Danh Sách Tài Khoản</h1>
 <p>
-    <a asp-area="Admin" asp-controller="UserAdmin" asp-action="Register">Create New</a>
+    <a asp-area="Admin" asp-controller="UserAdmin" asp-action="Register">Thêm tài khoản mới</a>
 </p>
 <table class="table">
     <thead>
@@ -21,13 +20,13 @@
                 @Html.DisplayNameFor(model => model.Id)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                @Html.DisplayNameFor(model => model.firstName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                @Html.DisplayNameFor(model => model.lastName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                @Html.DisplayNameFor(model => model.eMail)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PasswordHash)
@@ -37,9 +36,6 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.LastLogin)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.images)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.role)
@@ -55,13 +51,13 @@
                     @Html.DisplayFor(modelItem => item.Id)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.FirstName)
+                    @Html.DisplayFor(modelItem => item.firstName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LastName)
+                    @Html.DisplayFor(modelItem => item.lastName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Email)
+                    @Html.DisplayFor(modelItem => item.eMail)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PasswordHash)
@@ -72,9 +68,7 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.LastLogin)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.images)
-                </td>
+
                 <td>
                     @Html.DisplayFor(modelItem => item.role)
                 </td>
@@ -86,9 +80,10 @@
         }
     </tbody>
 </table>
+
 <script>
     $(document).ready(function () {
-        $(".btnNavbarSearch").click(function () {
+        function searchFunction() {
             var email = $(".searchInput").val();
 
             // Gửi yêu cầu AJAX tới action Search trong controller
@@ -103,8 +98,17 @@
                     console.error("Error:", error);
                 }
             });
+        }
+
+        $(".btnNavbarSearch").click(function () {
+            searchFunction();
+        });
+
+        $("#searchInput").keypress(function (event) {
+            if (event.which === 13) { // Kiểm tra nếu phím Enter được bấm
+                event.preventDefault(); // Ngăn chặn hành động mặc định của form
+                searchFunction(); // Gọi hàm searchFunction()
+            }
         });
     });
 </script>
-
-

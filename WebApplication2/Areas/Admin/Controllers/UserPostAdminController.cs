@@ -123,17 +123,14 @@ namespace WebApplication2.Areas.Admin.Controllers
                 return NotFound("Post not found");
             }
 
-            // Cập nhật chỉ các thuộc tính được chỉ định
-            existingPost.title = updatedPost.title ?? existingPost.title;
-            existingPost.content = updatedPost.content ?? existingPost.content;
-            // Cập nhật ngày cập nhật
-            existingPost.updatedAt = DateTime.Now;
+            // Đặt giá trị của trường IsApproved thành true để chỉ định bài viết đã được duyệt
+            postToApprove.IsApproved = true;
 
-            // Thực hiện cập nhật bài đăng trong cơ sở dữ liệu
-            var updatedResult = await _userPostCollection.ReplaceOneAsync(post => post.id == id, existingPost);
+            // Lưu thay đổi vào cơ sở dữ liệu
+            await _userPostCollection.ReplaceOneAsync(post => post.id == id, postToApprove);
 
-            // Chuyển hướng về trang chủ hoặc trang danh sách bài đăng
-            return RedirectToAction("Index", "UserPost");
+            // Chuyển hướng hoặc thực hiện hành động khác sau khi duyệt bài viết
+            return RedirectToAction("PendingPosts");
         }
 
 
@@ -184,6 +181,36 @@ namespace WebApplication2.Areas.Admin.Controllers
             // Chuyển hướng về trang chủ hoặc trang danh sách bài đăng
             return RedirectToAction("Index", "UserPostAdmin");
         }
+
+        // Phương thức để gửi thông báo cho chủ sở hữu bài viết đã bị xóa
+        private async Task SendNotificationToPostOwner(User_Post deletedPost)
+        {
+            // Lấy thông tin của chủ sở hữu bài viết
+            var owner = await _userCollection.Find(u => u.Id == deletedPost.CreatorId).FirstOrDefaultAsync();
+
+            // Kiểm tra xem chủ sở hữu có tồn tại hay không
+            if (owner != null)
+            {
+                // Tạo nội dung thông báo
+                var notificationContent = $"Bài viết của bạn có tiêu đề '{deletedPost.title}' đã bị xóa do vi phạm nguyên tắc.";
+
+                // Tạo thông báo
+                var notification = new Notification
+                {
+                    Content = notificationContent,
+                    Type = "post_deleted",
+                    UserId = deletedPost.CreatorId, // Gửi thông báo cho chủ sở hữu bài viết
+                    CreatedAt = DateTime.Now,
+                    IsRead = false
+                };
+
+                // Lưu thông báo vào cơ sở dữ liệu
+                await _notificationCollection.InsertOneAsync(notification);
+
+                // Đoạn mã để gửi thông báo đến người dùng, ví dụ: gửi email, thông báo trực tiếp trong ứng dụng, v.v.
+            }
+        }
+
         [HttpGet("Admin/UserPostAdmin/Search")]
         public async Task<IActionResult> Search(string id)
         {
