@@ -52,8 +52,35 @@ namespace WebApplication2.Controllers
 
             return View(postList);
         }
+        [HttpGet]
+        public async Task<IActionResult> DownloadFile(string id, int fileIndex)
+        {
+            var post = await _userPostCollection.Find(p => p.id == id).FirstOrDefaultAsync();
 
+            if (post == null || fileIndex < 0 || fileIndex >= post.Files.Count)
+            {
+                return NotFound();
+            }
 
+            var fileBytes = post.Files[fileIndex];
+            var fileExtension = Path.GetExtension(post.FileNames[fileIndex]); // Sử dụng tên tệp tin gốc
+
+            string contentType;
+            switch (fileExtension.ToLower())
+            {
+                case ".doc":
+                    contentType = "application/msword";
+                    break;
+                case ".docx":
+                    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                    break;
+                default:
+                    contentType = "application/octet-stream";
+                    break;
+            }
+
+            return File(fileBytes, contentType, post.FileNames[fileIndex]); // Sử dụng tên tệp tin gốc
+        }
         [HttpGet]
         public IActionResult Create()
         {
@@ -106,32 +133,56 @@ namespace WebApplication2.Controllers
                     // Đoạn mã để gửi thông báo đến người bạn, ví dụ: gửi email, thông báo trực tiếp trong ứng dụng, vv.
                 }
             }
+
             var files = HttpContext.Request.Form.Files;
 
-            // Handle multiple images efficiently (up to a reasonable limit)
+            // Handle images
             if (files != null)
             {
                 var imageCount = Math.Min(files.Count, 10); // Limit to 10 images (adjust as needed)
-
                 user_Post.images = new List<byte[]>(imageCount);
+
                 for (int i = 0; i < imageCount; i++)
                 {
-                    using (var ms = new MemoryStream())
+                    if (files[i].ContentType.StartsWith("image/"))
                     {
-                        await files[i].CopyToAsync(ms);
-                        user_Post.images.Add(ms.ToArray());
+                        using (var ms = new MemoryStream())
+                        {
+                            await files[i].CopyToAsync(ms);
+                            user_Post.images.Add(ms.ToArray());
+                        }
                     }
                 }
             }
 
-            // Insert data with images
+            // Handle Word and PDF files
+            if (files != null)
+            {
+                user_Post.Files = new List<byte[]>();
+                user_Post.FileNames = new List<string>();
+
+                foreach (var file in files)
+                {
+                    if (file.ContentType == "application/pdf" || file.ContentType == "application/msword" || file.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+                    {
+                        using (var ms = new MemoryStream())
+                        {
+                            await file.CopyToAsync(ms);
+                            user_Post.Files.Add(ms.ToArray());
+                            user_Post.FileNames.Add(file.FileName); // Lưu tên tệp tin gốc
+                        }
+                    }
+                }
+            }
+
+            // Insert data with images and files
             user_Post.createdAt = DateTime.Now;
             user_Post.Likes = 0;
             user_Post.count = 0;
             user_Post.IsApproved = false;
 
             // Add information about the creator
-            var creatorId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Đã thay đổi tên biến thành creatorId
+            var creatorId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             user_Post.CreatorId = creatorId;
             var creator = await _userCollection.Find(u => u.Id == creatorId).FirstOrDefaultAsync();
             if (creator != null)
@@ -186,14 +237,23 @@ namespace WebApplication2.Controllers
 
             // Kiểm tra xem bài đăng có tồn tại trong cơ sở dữ liệu không
             var existingPost = await _userPostCollection.Find(post => post.id == id).FirstOrDefaultAsync();
+
             if (existingPost == null)
             {
                 return NotFound("Post not found");
             }
 
+            // Kiểm tra xem có thay đổi gì không
+            if (updatedPost.title == existingPost.title && updatedPost.content == existingPost.content)
+            {
+                // Không có thay đổi, trả về trang danh sách bài đăng
+                return RedirectToAction("Index", "UserPost");
+            }
+
             // Cập nhật chỉ các thuộc tính được chỉ định
             existingPost.title = updatedPost.title ?? existingPost.title;
             existingPost.content = updatedPost.content ?? existingPost.content;
+
             // Cập nhật ngày cập nhật
             existingPost.updatedAt = DateTime.Now;
 
@@ -203,9 +263,6 @@ namespace WebApplication2.Controllers
             // Chuyển hướng về trang chủ hoặc trang danh sách bài đăng
             return RedirectToAction("Index", "UserPost");
         }
-
-
-
 
 
         [HttpGet]

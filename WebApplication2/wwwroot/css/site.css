@@ -425,6 +425,13 @@ svg.bi-bell-fill {
         font-weight: 100; /* Make the font thinner */
         opacity: 0.7;
     }
+    .box .download {
+        position: absolute;
+        width: 740px;
+        top: 64px;
+        left: 700px;
+        
+    }
     .box .p {
         position: absolute;
         width: 737px; /* Đảm bảo chiều rộng cố định */
@@ -675,20 +682,26 @@ svg.bi-bell-fill {
     width: 500px; /* Điều chỉnh kích thước của khung người dùng */
     margin-left: 120px; /* Di chuyển khung sang phải */
 }
-.remove-friend {
-    position: absolute;
-    right: 975px;
-    border: 2px solid #FC8717; /* Màu cam và độ dày viền */
-    border-radius: 20px; /* Độ cong của các góc */
-    padding: 6px 14px; /* Khoảng cách giữa viền và nội dung */
-    background-color: transparent; /* Màu nền trong suốt */
-    color: #FC8717; /* Màu chữ */
-    font-weight: bold; /* Độ đậm của chữ */
-    cursor: pointer; /* Bật chế độ con trỏ khi di chuột qua */
-    transition: all 0.3s ease; /* Hiệu ứng chuyển đổi màu khi hover */
+.friend-container {
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
-.remove-friend:hover {
-    background-color: #FC8717; /* Màu nền khi hover */
-    color: white; /* Màu chữ khi hover */
+.remove-friend {
+    position: absolute;
+    right: 10px;
+    border: 2px solid #FC8717;
+    border-radius: 20px;
+    padding: 6px 14px;
+    background-color: transparent;
+    color: #FC8717;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
+
+    .remove-friend:hover {
+        background-color: #FC8717;
+        color: white;
+    }

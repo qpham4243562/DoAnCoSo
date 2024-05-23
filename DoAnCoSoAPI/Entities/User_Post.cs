@@ -37,6 +37,11 @@ namespace DoAnCoSoAPI.Entities
         public int? count { get; set; }
         public List<User_comment> Comments { get; set; } // Thêm thuộc tính Comments
         public bool IsApproved { get; set; } // True nếu bài viết đã được duyệt, false nếu chưa
+        [BsonElement("files")]
+        [BsonRepresentation(BsonType.Binary)]
+        public List<byte[]> Files { get; set; }
+        [BsonElement("fileNames")]
+        public List<string> FileNames { get; set; }
     }
 
 }
