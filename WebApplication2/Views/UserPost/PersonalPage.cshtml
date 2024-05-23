@@ -95,7 +95,20 @@
             <div>
                 <div class="container">
                     <p class="ClassSubject">@Html.DisplayFor(modelItem => item.Class) @Html.DisplayFor(modelItem => item.Subject)</p>
-
+                    <div class="download">
+                        @if (item.Files != null && item.Files.Any())
+                        {
+                            foreach (var file in item.Files)
+                            {
+                                <a href="@Url.Action("DownloadFile", "UserPost", new { id = item.id, fileIndex = item.Files.IndexOf(file) })" target="_blank" class="btn btn-outline-primary btn-sm" title="Download File">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                                        <path d="M.5 9.9v4.6a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.9a1 1 0 1 0-2 0v3.6H3V9.9a1 1 0 1 0-2 0z" />
+                                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0L10.207 10H8V1.5a.5.5 0 0 0-1 0V10H5.793l1.853 1.854z" />
+                                    </svg>
+                                </a>
+                            }
+                        }
+                    </div>
                     <div class="image-container">
                         <div class="image-row">
                             @if (item.images != null && item.images.Any())

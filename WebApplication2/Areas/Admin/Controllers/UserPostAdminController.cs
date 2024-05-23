@@ -50,6 +50,35 @@ namespace WebApplication2.Areas.Admin.Controllers
             return View(postList);
         }
         [HttpGet]
+        public async Task<IActionResult> DownloadFile(string id, int fileIndex)
+        {
+            var post = await _userPostCollection.Find(p => p.id == id).FirstOrDefaultAsync();
+
+            if (post == null || fileIndex < 0 || fileIndex >= post.Files.Count)
+            {
+                return NotFound();
+            }
+
+            var fileBytes = post.Files[fileIndex];
+            var fileExtension = Path.GetExtension(post.FileNames[fileIndex]); // Sử dụng tên tệp tin gốc
+
+            string contentType;
+            switch (fileExtension.ToLower())
+            {
+                case ".doc":
+                    contentType = "application/msword";
+                    break;
+                case ".docx":
+                    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                    break;
+                default:
+                    contentType = "application/octet-stream";
+                    break;
+            }
+
+            return File(fileBytes, contentType, post.FileNames[fileIndex]); // Sử dụng tên tệp tin gốc
+        }
+        [HttpGet]
         public async Task<IActionResult> ApprovedPosts()
         {
             var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

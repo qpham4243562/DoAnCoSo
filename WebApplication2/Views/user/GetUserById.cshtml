@@ -4,17 +4,16 @@
 
 <div class="user-info">
     <div class="user-image">
-        @foreach (var image in Model.images.ToImages())
+        @if (Model.images != null && Model.images.Any())
         {
-            @if (Model.images.ToImages().Any())
+            foreach (var image in Model.images.ToImages())
             {
-                <img class="user-image zoomable-image" src="data:image/jpeg;base64,@Convert.ToBase64String(image)">
-
+                <img class="user-image zoomable-image" src="data:image/jpeg;base64,@Convert.ToBase64String(image)" />
             }
-            else
-            {
-                <img class="user-image zoomable-image" src="~/images/defaultAvatar.jpg" />
-            }
+        }
+        else
+        {
+            <img class="user-image zoomable-image" src="~/images/defaultAvatar.jpg" alt="Default Avatar" />
         }
     </div>
     <div class="user-details">
