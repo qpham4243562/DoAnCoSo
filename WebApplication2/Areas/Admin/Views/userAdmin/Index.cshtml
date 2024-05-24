@@ -5,43 +5,42 @@
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <div class="input-group">
-    <input id="searchInput" class="form-control searchInput" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+    <input id="searchInput" class="form-control searchInput" type="text" placeholder="Search for email..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
     <button class="btn btn-primary btnNavbarSearch" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i> Search</button>
 </div>
 
-
-<h1>Index</h1>
+<h1>Danh Sách Tài Khoản</h1>
 <p>
-    <a asp-area="Admin" asp-controller="UserAdmin" asp-action="Register">Create New</a>
+    <a asp-area="Admin" asp-controller="UserAdmin" asp-action="Register">Thêm tài khoản mới</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Id)
+                ID_User
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.firstName)
+                FirstName
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.lastName)
+                LastName
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.eMail)
+                Email
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PasswordHash)
+                Password
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RegisterAt)
+                Register_At
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastLogin)
+                Last_Login
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.role)
+                Role
             </th>
-            <th></th>
+            <th>Actions </th>
         </tr>
     </thead>
     <tbody>
@@ -79,12 +78,12 @@
                 </td>
             </tr>
         }
-
     </tbody>
 </table>
+
 <script>
     $(document).ready(function () {
-        $(".btnNavbarSearch").click(function () {
+        function searchFunction() {
             var email = $(".searchInput").val();
 
             // Gửi yêu cầu AJAX tới action Search trong controller
@@ -99,6 +98,17 @@
                     console.error("Error:", error);
                 }
             });
+        }
+
+        $(".btnNavbarSearch").click(function () {
+            searchFunction();
+        });
+
+        $("#searchInput").keypress(function (event) {
+            if (event.which === 13) { // Kiểm tra nếu phím Enter được bấm
+                event.preventDefault(); // Ngăn chặn hành động mặc định của form
+                searchFunction(); // Gọi hàm searchFunction()
+            }
         });
     });
 </script>

@@ -4,42 +4,39 @@
     ViewData["Title"] = "Index";
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<div>
-    <input id="postIdInput" class="form-control" type="text" placeholder="Enter post ID..." aria-label="Enter post ID...">
-    <button class="btn btn-primary" id="searchButton" type="button">Search</button>
+
+<div class="input-group">
+    <input id="searchInput" class="form-control searchInput" type="text" placeholder="Enter ID post..." aria-label="Enter ID post..." aria-describedby="btnNavbarSearch" />
+    <button class="btn btn-primary btnNavbarSearch" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i> Search</button>
 </div>
+<h1>Danh Sách Bài Đăng</h1>
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.id)
+                ID_Post
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.title)
+                Title
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.content)
+                Content
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.createdAt)
+                Created_At
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.updatedAt)
+                Updated_At
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatorId)
+                Creator_ID
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatorName)
+                Creator_Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.images)
+                Images
                 <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">
@@ -57,40 +54,25 @@
                 </div>
             </th>
             <th>
-                File tải lên
+                File
             </th>
-
+            <th>
+                Actions
+            </th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
+                <td>@Html.DisplayFor(modelItem => item.id)</td>
+                <td>@Html.DisplayFor(modelItem => item.title)</td>
+                <td>@Html.DisplayFor(modelItem => item.content)</td>
+                <td>@Html.DisplayFor(modelItem => item.createdAt)</td>
+                <td>@Html.DisplayFor(modelItem => item.updatedAt)</td>
+                <td>@Html.DisplayFor(modelItem => item.CreatorId)</td>
+                <td>@Html.DisplayFor(modelItem => item.CreatorName)</td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.content)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.createdAt)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.updatedAt)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatorId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatorName)
-                </td>
-                <td>
-                   
-                    
-
                     @if (item.images != null && item.images.Any())
                     {
                         foreach (var image in item.images)
@@ -99,6 +81,21 @@
                         }
                     }
 
+                    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="imageModalLabel">Image</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <img id="modalImage" src="" alt="Post Image" style="max-width: 100%; max-height: 400px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </td>
                 <td>
                     @if (item.Files != null && item.Files.Any())
@@ -122,30 +119,41 @@
         }
     </tbody>
 </table>
+
 <script>
     $(document).ready(function () {
-        $("body").on("click", ".post-image", function () {
-            var imageUrl = $(this).attr("src");
-            $("#modalImage").attr("src", imageUrl);
-            $("#imageModal").modal("show");
-        });
-        $("#searchButton").click(function () {
-            // Lấy giá trị ID của bài đăng từ input field
-            var postId = $("#postIdInput").val();
+        function searchFunction() {
+            var postId = $("#searchInput").val();
 
             // Gửi yêu cầu AJAX đến controller
             $.ajax({
                 type: "GET",
                 url: "/Admin/UserPostAdmin/Search?id=" + postId,
                 success: function (response) {
-                    // Xử lý phản hồi từ controller, hiển thị kết quả
-                    // Ví dụ: chuyển hướng đến trang chi tiết bài đăng
+                    // Chuyển hướng đến trang chi tiết bài đăng
                     window.location.href = "/Admin/UserPostAdmin/Search?id=" + postId;
                 },
                 error: function (error) {
                     console.error("Error:", error);
                 }
             });
+        }
+
+        $("#btnNavbarSearch").click(function () {
+            searchFunction();
+        });
+
+        $("#searchInput").keypress(function (event) {
+            if (event.which === 13) { // Kiểm tra nếu phím Enter được bấm
+                event.preventDefault(); // Ngăn chặn hành động mặc định của form
+                searchFunction(); // Gọi hàm searchFunction()
+            }
+        });
+
+        $("body").on("click", ".post-image", function () {
+            var imageUrl = $(this).attr("src");
+            $("#modalImage").attr("src", imageUrl);
+            $("#imageModal").modal("show");
         });
     });
 </script>
