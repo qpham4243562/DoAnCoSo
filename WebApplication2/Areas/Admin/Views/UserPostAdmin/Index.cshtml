@@ -16,10 +16,7 @@
         <tr>
             <th>
                 ID_Post
-            </th>
-            <th>
-                Title
-            </th>
+            </th>      
             <th>
                 Content
             </th>
@@ -65,8 +62,7 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(modelItem => item.id)</td>
-                <td>@Html.DisplayFor(modelItem => item.title)</td>
+                <td>@Html.DisplayFor(modelItem => item.id)</td>             
                 <td>@Html.DisplayFor(modelItem => item.content)</td>
                 <td>@Html.DisplayFor(modelItem => item.createdAt)</td>
                 <td>@Html.DisplayFor(modelItem => item.updatedAt)</td>
