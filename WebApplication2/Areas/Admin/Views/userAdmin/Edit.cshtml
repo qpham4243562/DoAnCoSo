@@ -4,9 +4,9 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Edit User</h1>
 
-<h4>User</h4>
+
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -14,9 +14,10 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" />
+                <input asp-for="Id" class="form-control" readonly />
                 <span asp-validation-for="Id" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="firstName" class="control-label"></label>
                 <input asp-for="firstName" class="form-control" />
@@ -39,28 +40,29 @@
             </div>
             <div class="form-group">
                 <label asp-for="RegisterAt" class="control-label"></label>
-                <input asp-for="RegisterAt" class="form-control" />
+                <input asp-for="RegisterAt" class="form-control readonly-input" readonly />
                 <span asp-validation-for="RegisterAt" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="LastLogin" class="control-label"></label>
-                <input asp-for="LastLogin" class="form-control" />
+                <input asp-for="LastLogin" class="form-control readonly-input" readonly />
                 <span asp-validation-for="LastLogin" class="text-danger"></span>
             </div>
-           
             <div class="form-group">
                 <label asp-for="role" class="control-label"></label>
-                <input asp-for="role" class="form-control" />
+                <select asp-for="role" class="form-control">
+                    <option value="admin">admin</option>
+                    <option value="user">user</option>
+                </select>
                 <span asp-validation-for="role" class="text-danger"></span>
             </div>
+            <br />
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-primary" /> |
+
+                <a asp-action="Index">Back to List</a>
+
             </div>
         </form>
     </div>
 </div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
