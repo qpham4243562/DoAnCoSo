@@ -243,19 +243,83 @@ namespace WebApplication2.Controllers
                 return NotFound("Post not found");
             }
 
-            // Kiểm tra xem có thay đổi gì không
-            if (updatedPost.title == existingPost.title && updatedPost.content == existingPost.content)
-            {
-                // Không có thay đổi, trả về trang danh sách bài đăng
-                return RedirectToAction("Index", "UserPost");
-            }
-
-            // Cập nhật chỉ các thuộc tính được chỉ định
+            // Cập nhật các thuộc tính được chỉ định
             existingPost.title = updatedPost.title ?? existingPost.title;
             existingPost.content = updatedPost.content ?? existingPost.content;
+            existingPost.Class = updatedPost.Class ?? existingPost.Class;
+            existingPost.Subject = updatedPost.Subject ?? existingPost.Subject;
 
             // Cập nhật ngày cập nhật
             existingPost.updatedAt = DateTime.Now;
+
+            // Xử lý cập nhật hình ảnh
+            var images = HttpContext.Request.Form.Files.Where(f => f.ContentType.StartsWith("image/"));
+            if (images != null && images.Any())
+            {
+                existingPost.images = new List<byte[]>();
+                foreach (var image in images)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        await image.CopyToAsync(ms);
+                        existingPost.images.Add(ms.ToArray());
+                    }
+                }
+            }
+            else
+            {
+                // Nếu không có hình ảnh mới, giữ nguyên danh sách hình ảnh cũ
+                existingPost.images = existingPost.images;
+            }
+
+            // Xử lý cập nhật file Word
+            var wordFiles = HttpContext.Request.Form.Files.Where(f => f.ContentType == "application/msword" || f.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            if (wordFiles != null && wordFiles.Any())
+            {
+                existingPost.Files = new List<byte[]>();
+                existingPost.FileNames = new List<string>();
+                foreach (var file in wordFiles)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        await file.CopyToAsync(ms);
+                        existingPost.Files.Add(ms.ToArray());
+                        existingPost.FileNames.Add(file.FileName);
+                    }
+                }
+            }
+            else
+            {
+                // Nếu không có file Word mới, giữ nguyên danh sách file Word cũ
+                existingPost.Files = existingPost.Files;
+                existingPost.FileNames = existingPost.FileNames;
+            }
+
+            // Xử lý cập nhật file PDF
+            var pdfFiles = HttpContext.Request.Form.Files.Where(f => f.ContentType == "application/pdf");
+            if (pdfFiles != null && pdfFiles.Any())
+            {
+                if (existingPost.Files == null)
+                {
+                    existingPost.Files = new List<byte[]>();
+                    existingPost.FileNames = new List<string>();
+                }
+                foreach (var file in pdfFiles)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        await file.CopyToAsync(ms);
+                        existingPost.Files.Add(ms.ToArray());
+                        existingPost.FileNames.Add(file.FileName);
+                    }
+                }
+            }
+            else
+            {
+                // Nếu không có file PDF mới, giữ nguyên danh sách file PDF cũ
+                existingPost.Files = existingPost.Files;
+                existingPost.FileNames = existingPost.FileNames;
+            }
 
             // Thực hiện cập nhật bài đăng trong cơ sở dữ liệu
             var updatedResult = await _userPostCollection.ReplaceOneAsync(post => post.id == id, existingPost);
@@ -263,7 +327,6 @@ namespace WebApplication2.Controllers
             // Chuyển hướng về trang chủ hoặc trang danh sách bài đăng
             return RedirectToAction("Index", "UserPost");
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Delete(string id)
