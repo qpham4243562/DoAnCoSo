@@ -42,34 +42,34 @@
 
     <div class="col-md-6">
         <div class="container">
-                <h2 class="res-text">Đăng kí tài khoản</h2>
+                <h2 class="res-text">Đăng Kí Tài Khoản</h2>
                 <form asp-action="Register">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
-                        <label asp-for="firstName" class="control-label">FirstName</label>
-                        <input asp-for="firstName" class="form-control" />
+                        <label asp-for="firstName" class="control-label">Họ</label>
+                        <input asp-for="firstName" class="form-control" placeholder="Nhập họ..."/>
                         <span asp-validation-for="firstName" class="text-danger"></span>
                     </div>
                     <div class="form-group mt-3">
-                        <label asp-for="lastName" class="control-label">LastName</label>
-                        <input asp-for="lastName" class="form-control" />
+                        <label asp-for="lastName" class="control-label" >Tên</label>
+                        <input asp-for="lastName" class="form-control" placeholder="Nhập tên..." />
                         <span asp-validation-for="lastName" class="text-danger"></span>
                     </div>
                     <div class="form-group mt-3">
                         <label asp-for="eMail" class="control-label">Email</label>
-                        <input asp-for="eMail" class="form-control" />
+                        <input asp-for="eMail" class="form-control" placeholder="Nhập email..." />
                         <span asp-validation-for="eMail" class="text-danger"></span>
                     </div>
                     <div class="form-group mt-3">
-                        <label asp-for="PasswordHash" class="control-label">Password</label>
-                        <input asp-for="PasswordHash" class="form-control" />
+                        <label asp-for="PasswordHash" class="control-label">Mật khẩu</label>
+                        <input asp-for="PasswordHash" class="form-control" placeholder="Nhập mật khẩu..." />
                         <span asp-validation-for="PasswordHash" class="text-danger"></span>
                     </div>
 
                     @*<div class="form-group mt-2">
                         <input type="submit" value="Create" class="btn btn-primary" />
                     </div> *@
-                    <button type="submit" value="Create" class="btn mt-3" style="background-color: #FC8717; color: white; width:250px;margin-left:30%;"> Đăng ký</button>
+                    <button type="submit" value="Create" class="btn mt-3" style="background-color: #FC8717; color: white; width:250px;margin-left:30%;">Đăng Ký</button>
                 </form>
         </div>
     </div>
@@ -80,7 +80,7 @@
 }
     <footer class="res-footer mt-5">
         <p>
-            Công ty cổ phần Circle Sync &copy; 2014 - 2024 <br /> Liên hệ: Nguyễn Minh Tú - Hotline: 0399727809 - eMail: CircleSync@gmail.com
+            Công ty cổ phần Circle Sync &copy; 2014 - 2024 <br /> Liên hệ: Nguyễn Minh Tú - Hotline: 0399727809 - Email: CircleSync@gmail.com
         </p>
     </footer>
 </body>

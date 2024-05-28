@@ -5,6 +5,7 @@ using MongoDB.Driver;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using WebApplication2.Models;
 
 namespace WebApplication2.Areas.Admin.Controllers
@@ -40,6 +41,15 @@ namespace WebApplication2.Areas.Admin.Controllers
                 return BadRequest("Invalid user object");
             }
 
+            var emailRegex = new Regex(@"^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$");
+            if (!emailRegex.IsMatch(user.eMail))
+            {
+                return BadRequest("Định dạng email không hợp lệ");
+            }
+            if (user.PasswordHash.Length < 6)
+            {
+                return BadRequest("Mật khẩu phải có ít nhất 6 ký tự");
+            }
             // Check if user with the same email already exists
             var existingUser = await _userCollection.Find(u => u.eMail == user.eMail).FirstOrDefaultAsync();
             if (existingUser != null)

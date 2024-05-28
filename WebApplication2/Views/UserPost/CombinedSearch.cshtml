@@ -1,6 +1,6 @@
 ﻿@using System.Security.Claims
 @model IEnumerable<WebApplication2.Models.CombinedSearchResultsViewModel>
-<h3>Users:</h3>
+<h3>Người dùng: </h3>
 @foreach (var item in Model)
 {
     @if (item.Users.Any())
@@ -49,9 +49,9 @@
 
     else
     {
-        <p>No users found.</p>
+        <p>Không tìm thấy người dùng tìm kiếm</p>
     }
-    <h3>Posts:</h3>
+    <h3>Bài viết</h3>
     @if (item.Posts.Any())
     {
         @foreach (var postItem in item.Posts)
