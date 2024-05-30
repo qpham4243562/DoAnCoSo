@@ -159,6 +159,11 @@ body {
     .res-footer > p {
         padding: 25px 0;
     }
+.btn-reset-password {
+    background-color: #FC8717 !important;
+    color: white;
+}
+
 
 .nav-link {
     position: relative;

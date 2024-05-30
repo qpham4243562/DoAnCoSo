@@ -41,5 +41,10 @@ namespace DoAnCoSoAPI.Entities
         public Boolean? IsOnline { get; set; }
        
         public List<string> UserPosts { get; set; } = new List<string>();
+
+        [BsonElement("ResetToken")]
+        [BsonRepresentation(BsonType.String)]
+        public string? ResetToken { get; set; }
+
     }
 }
