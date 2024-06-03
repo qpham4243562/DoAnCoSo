@@ -2,11 +2,7 @@
     font-size: 14px;
 }
 
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
-}
+
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
@@ -64,17 +60,19 @@ body {
     border-radius: 10px;
     transition: box-shadow 0.3s; /* Hiệu ứng chuyển động khi hover */
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Hiệu ứng shadow mặc định */
+    cursor: pointer;
 }
 
     /* Dropdown options */
     .custom-select option {
         color: orange; /* Màu chữ */
         background-color: white; /* Màu nền */
+
     }
 
-.custom-select-container:hover {
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3); /* Hiệu ứng shadow khi hover */
-}
+/*.custom-select-container:hover {
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+}*/
 /* Dropdown màu cam */
 .dropdown-orange {
     border-color: orange; /* Màu viền */
@@ -83,7 +81,7 @@ body {
 }
 
 .large-input {
-    width: 1000px; /* Độ rộng mong muốn */
+    width: 800px; /* Độ rộng mong muốn */
     height: 150px; /* Chiều cao mong muốn */
     padding: 10px; /* Khoảng cách giữa nội dung và viền */
     border-radius: 15px; /* Bo tròn cạnh */
@@ -100,7 +98,7 @@ body {
     background-color: orange; /* Màu nền */
     color: white; /* Màu chữ */
     cursor: pointer; /* Con trỏ khi di chuột */
-    margin-right: 20px;
+    margin-right: 60px;
 }
 
     /* Hover effect */
@@ -185,14 +183,14 @@ svg.bi-bell-fill {
     position: fixed;
     bottom: 20px;
     left: 20px;
-    width: 1400px; /* Đặt độ dài của input là 200px */
+    width: 850px;*/ /* Đặt độ dài của input là 200px */
     z-index: 999;
 }
 
 #createCommentButton {
     position: fixed;
     bottom: 20px;
-    right: 20px; /* Đặt vị trí của button ở góc dưới bên phải */
+    right: 530px; /* Đặt vị trí của button ở góc dưới bên phải */
     z-index: 999;
 }
 /*style.css index*/
@@ -292,6 +290,7 @@ svg.bi-bell-fill {
         text-align: right;
         letter-spacing: 0;
         line-height: normal;
+        cursor: pointer;
     }
 
     .box .img {

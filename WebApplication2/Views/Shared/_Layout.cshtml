@@ -31,7 +31,9 @@
                         <a class="nav-link" href="https://localhost:7222/Chat/Index"><i class="bi bi-chat-dots-fill" style="color: white;"></i></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="userDropdown"><i class="bi bi-person-fill" style="color: white;"></i></a>
+                        <a class="nav-link" id="userDropdown" style="cursor: pointer;">
+                            <i class="bi bi-person-fill" style="color: white;"></i>
+                        </a>
                         <div class="dropdown-menu dropdown-menu-left" aria-labelledby="userDropdown" id="userDropdownMenu">
                             <a class="dropdown-item" asp-controller="user" asp-action="Index">Trang cá nhân</a>
                             <a class="dropdown-item" asp-controller="user" asp-action="Update">Cập nhật, xóa tài khoản</a>
