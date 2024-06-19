@@ -4,82 +4,80 @@
     ViewData["Title"] = "Index";
 }
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<div class="input-group">
-    <input id="searchInput" class="form-control searchInput" type="text" placeholder="Search for email..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
-    <button class="btn btn-primary btnNavbarSearch" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i> Search</button>
-</div>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-<h1>Danh Sách Tài Khoản</h1>
-<p>
-    <a asp-area="Admin" asp-controller="UserAdmin" asp-action="Register">Thêm tài khoản mới</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                ID_User
-            </th>
-            <th>
-                FirstName
-            </th>
-            <th>
-                LastName
-            </th>
-            <th>
-                Email
-            </th>
-            <th>
-                Password
-            </th>
-            <th>
-                Register_At
-            </th>
-            <th>
-                Last_Login
-            </th>
-            <th>
-                Role
-            </th>
-            <th>Actions </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.firstName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.lastName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.eMail)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PasswordHash)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.RegisterAt)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LastLogin)
-                </td>
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
 
-                <td>
-                    @Html.DisplayFor(modelItem => item.role)
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-                </td>
-            </tr>
+    .table {
+        background-color: #ffffff;
+    }
+
+        .table th {
+            background-color: #007bff;
+            color: #ffffff;
         }
-    </tbody>
-</table>
+
+    .input-group {
+        margin-bottom: 20px;
+    }
+
+    .searchInput {
+        border-radius: 0.25rem;
+    }
+
+    .btn {
+        border-radius: 0.25rem;
+    }
+
+    .btn-rounded {
+        border-radius: 0.5rem;
+    }
+</style>
+
+<div class="container mt-3">
+    <div class="input-group mb-3">
+        <input id="searchInput" class="form-control searchInput" type="text" placeholder="Search for email..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+        <div class="input-group-append">
+            <button class="btn btn-primary btnNavbarSearch btn-rounded" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i> Search</button>
+        </div>
+    </div>
+
+    <h1 class="mb-4">Danh Sách Tài Khoản</h1>
+    <p>
+        <a asp-area="Admin" asp-controller="UserAdmin" asp-action="Register" class="btn btn-primary btn-sm btn-rounded"><i class="fas fa-plus"></i> Thêm tài khoản mới</a>
+    </p>
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.firstName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.lastName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.eMail)</td>
+                    <td>@Html.DisplayFor(modelItem => item.role)</td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-success btn-sm btn-rounded" }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger btn-sm btn-rounded" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 <script>
     $(document).ready(function () {
@@ -112,5 +110,3 @@
         });
     });
 </script>
-
-

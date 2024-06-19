@@ -126,12 +126,16 @@ namespace WebApplication2.Areas.Admin.Controllers
                 return BadRequest();
             }
 
-            // Kiểm tra xem người dùng đã cung cấp mật khẩu mới hay không
-            if (!string.IsNullOrEmpty(user.PasswordHash))
-            {
-                // Băm mật khẩu mới
-                user.PasswordHash = HashPassword(user.PasswordHash);
-            }
+            var existingUser = await _userCollection.Find(u => u.Id == id).FirstOrDefaultAsync();
+
+            // Nếu người dùng không nhập firstName, giữ nguyên giá trị cũ
+            user.firstName = user.firstName ?? existingUser.firstName;
+            // Nếu người dùng không nhập lastName, giữ nguyên giá trị cũ
+            user.lastName = user.lastName ?? existingUser.lastName;
+            // Nếu người dùng không nhập email, giữ nguyên giá trị cũ
+            user.eMail = user.eMail ?? existingUser.eMail;
+            // Giữ nguyên mật khẩu cũ
+            user.PasswordHash = existingUser.PasswordHash;
 
             // Cập nhật thông tin người dùng
             var result = await _userCollection.ReplaceOneAsync(u => u.Id == id, user);
@@ -145,7 +149,6 @@ namespace WebApplication2.Areas.Admin.Controllers
                 return NotFound();
             }
         }
-
 
         [HttpGet("Admin/userAdmin/Delete/{id}")]
         public async Task<IActionResult> Delete(string id)

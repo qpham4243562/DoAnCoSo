@@ -1,8 +1,83 @@
-﻿@model IEnumerable<DoAnCoSoAPI.Entities.User_Post>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Quản lý và Trao đổi học liệu</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 20px;
+            font-family: Arial, sans-serif;
+        }
 
-@{
-    ViewData["Title"] = "Index";
-}
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
 
-<h1>Chào mừng đến với page Admin</h1>
+        .card {
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
 
+        .card-header {
+            background-color: #007bff;
+            color: #fff;
+            font-weight: bold;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            padding: 15px;
+        }
+
+        .card-body {
+            background-color: #fff;
+            padding: 20px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .card-text {
+            line-height: 1.6;
+        }
+
+        .card-img {
+            max-width: 100%;
+            height: auto; /* Thay đổi từ '30%' thành 'auto' để hình ảnh co dãn tự động */
+            max-height: 400px; /* Giới hạn chiều cao tối đa của hình ảnh */
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+            .card-img:hover {
+                transform: scale(1.1);
+                transition: transform 0.3s ease;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                Trang chủ Admin
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Chào mừng đến với hệ thống quản lý và trao đổi học liệu!</h5>
+                <p class="card-text">Đây là trang chủ của bạn, nơi bạn có thể quản lý và kiểm soát các hoạt động trong hệ thống.</p>
+                <img src="~/images/logi.jpg" alt="Admin Dashboard Image" class="card-img">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
