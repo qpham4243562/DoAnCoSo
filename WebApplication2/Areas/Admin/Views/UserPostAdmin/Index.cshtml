@@ -3,119 +3,161 @@
 @{
     ViewData["Title"] = "Index";
 }
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
 
-<div class="input-group">
-    <input id="searchInput" class="form-control searchInput" type="text" placeholder="Enter ID post..." aria-label="Enter ID post..." aria-describedby="btnNavbarSearch" />
-    <button class="btn btn-primary btnNavbarSearch" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i> Search</button>
-</div>
-<h1>Danh Sách Bài Đăng</h1>
+    .table {
+        background-color: #ffffff;
+    }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                ID_Post
-            </th>      
-            <th>
-                Content
-            </th>
-            <th>
-                Created_At
-            </th>
-            <th>
-                Updated_At
-            </th>
-            <th>
-                Creator_ID
-            </th>
-            <th>
-                Creator_Name
-            </th>
-            <th>
-                Images
-                <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="imageModalLabel">Post Image</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <img id="modalImage" src="" alt="Post Image" style="max-width: 100%; max-height: 400px;">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </th>
-            <th>
-                File
-            </th>
-            <th>
-                Actions
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.id)</td>             
-                <td>@Html.DisplayFor(modelItem => item.content)</td>
-                <td>@Html.DisplayFor(modelItem => item.createdAt)</td>
-                <td>@Html.DisplayFor(modelItem => item.updatedAt)</td>
-                <td>@Html.DisplayFor(modelItem => item.CreatorId)</td>
-                <td>@Html.DisplayFor(modelItem => item.CreatorName)</td>
-                <td>
-                    @if (item.images != null && item.images.Any())
-                    {
-                        foreach (var image in item.images)
-                        {
-                            <img class="post-image" src="data:image/jpeg;base64,@Convert.ToBase64String(image)" alt="Post Image" style="max-width: 100px; max-height: 100px;" />
-                        }
-                    }
-
-                    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="imageModalLabel">Image</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <img id="modalImage" src="" alt="Post Image" style="max-width: 100%; max-height: 400px;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    @if (item.Files != null && item.Files.Any())
-                    {
-                        foreach (var file in item.Files)
-                        {
-                            <a href="@Url.Action("DownloadFile", "UserPostAdmin", new { id = item.id, fileIndex = item.Files.IndexOf(file) })" target="_blank" class="btn btn-outline-primary btn-sm" title="Download File">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
-                                    <path d="M.5 9.9v4.6a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.9a1 1 0 1 0-2 0v3.6H3V9.9a1 1 0 1 0-2 0z" />
-                                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0L10.207 10H8V1.5a.5.5 0 0 0-1 0V10H5.793l1.853 1.854z" />
-                                </svg>
-                            </a>
-                        }
-                    }
-                </td>
-                <td>
-
-                    @Html.ActionLink("Delete", "Delete", new { id = item.id })
-                </td>
-            </tr>
+        .table th {
+            background-color: #007bff;
+            color: #ffffff;
         }
-    </tbody>
-</table>
 
+        .table th, .table td {
+            padding: 1rem;
+        }
+
+            .table td:nth-child(6) {
+                width: 200px;
+            }
+
+    .btn {
+        border-radius: 0.25rem;
+    }
+
+    .btn-rounded {
+        border-radius: 1rem;
+    }
+
+    .post-image {
+        cursor: pointer;
+        border-radius: 0.5rem;
+    }
+
+    .modal-body img {
+        border-radius: 0.5rem;
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="input-group mb-4">
+        <input id="searchInput" class="form-control searchInput" type="text" placeholder="Enter ID post..." aria-label="Enter ID post..." aria-describedby="btnNavbarSearch" />
+        <button class="btn btn-primary btnNavbarSearch" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i> Search</button>
+    </div>
+
+    <h1 class="mb-4">Danh Sách Bài Đăng</h1>
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Content</th>
+                <th>Created_At</th>
+                <th>Updated_At</th>
+                <th>Creator_Name</th>
+                <th>Images</th>
+                <th>File</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @{
+                            var content = item.content;
+                            if (content.Length > 20)
+                            {
+                                <span class="short-content">@content.Substring(0, 20)</span>
+                                <span class="more-content" style="display:none">@content</span>
+                                <a href="javascript:void(0);" class="toggle-content">...</a>
+                            }
+                            else
+                            {
+                                <span>@content</span>
+                            }
+                        }
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.createdAt)</td>
+                    <td>@Html.DisplayFor(modelItem => item.updatedAt)</td>
+                    <td>@Html.DisplayFor(modelItem => item.CreatorName)</td>
+                    <td>
+                        @if (item.images != null && item.images.Any())
+                        {
+                            <div id="carouselExampleIndicators-@item.id" class="carousel slide" data-ride="carousel">
+                                <ol class="carousel-indicators">
+                                    @for (var i = 0; i < item.images.Count; i++)
+                                    {
+                                        <li data-target="#carouselExampleIndicators-@item.id" data-slide-to="@i" class="@(i == 0 ? "active" : "")"></li>
+                                    }
+                                </ol>
+                                <div class="carousel-inner">
+                                    @for (var i = 0; i < item.images.Count; i++)
+                                    {
+                                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                                            <img class="d-block w-100 post-image" src="data:image/jpeg;base64,@Convert.ToBase64String(item.images[i])" alt="Post Image">
+                                        </div>
+                                    }
+                                </div>
+                                <a class="carousel-control-prev" href="#carouselExampleIndicators-@item.id" role="button" data-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="carousel-control-next" href="#carouselExampleIndicators-@item.id" role="button" data-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </div>
+                        }
+                    </td>
+                    <td>
+                        @if (item.Files != null && item.Files.Any())
+                        {
+                            foreach (var file in item.Files)
+                            {
+                                <a href="@Url.Action("DownloadFile", "UserPostAdmin", new { id = item.id, fileIndex = item.Files.IndexOf(file) })" target="_blank" class="btn btn-outline-primary btn-sm btn-rounded" title="Download File">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                                        <path d="M.5 9.9v4.6a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.9a1 1 0 1 0-2 0v3.6H3V9.9a1 1 0 1 0-2 0z" />
+                                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0L10.207 10H8V1.5a.5.5 0 0 0-1 0V10H5.793l1.853 1.854z" />
+                                    </svg>
+                                </a>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @Html.ActionLink("Delete", "Delete", new { id = item.id }, new { @class = "btn btn-danger btn-sm btn-rounded" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal for image -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Post Image</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="modalImage" src="" alt="Post Image" style="max-width: 100%; max-height: 400px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script>
     $(document).ready(function () {
         function searchFunction() {
@@ -150,6 +192,22 @@
             var imageUrl = $(this).attr("src");
             $("#modalImage").attr("src", imageUrl);
             $("#imageModal").modal("show");
+        });
+
+        $("body").on("click", ".toggle-content", function () {
+            var $this = $(this);
+            var shortContent = $this.siblings(".short-content");
+            var moreContent = $this.siblings(".more-content");
+
+            if (shortContent.is(":visible")) {
+                shortContent.hide();
+                moreContent.show();
+                $this.text("ẩn bớt");
+            } else {
+                shortContent.show();
+                moreContent.hide();
+                $this.text("...");
+            }
         });
     });
 </script>

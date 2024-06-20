@@ -3,63 +3,67 @@
 @{
     ViewData["Title"] = "Index";
 }
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<h1>Danh sách báo cáo</h1>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                ID_Report
-            </th>
-            <th>
-                ID_Post
-            </th>
-            <th>
-                Reason
-            </th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-5">
+    <h1 class="mb-4">Danh Sách Báo Cáo</h1>
+    <table class="table table-hover">
+        <thead class="thead-dark">
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PostId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Reason)
-                </td>
-                <td>
-                    @Html.ActionLink("Delete", "Delete", new { id = item.id })
-                </td>
+                <th>ID_Post</th>
+                <th>Reason</th>
+                <th>Action</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.PostId)</td>
+                    <td>
+                        @{
+                            string reason = item.Reason;
+                            if (reason.Length > 20)
+                            {
+                                <span class="short-reason">@reason.Substring(0, 20)</span>
+                                <span class="more-reason" style="display:none">@reason</span>
+                                <a href="javascript:void(0);" class="toggle-reason">...</a>
+                            }
+                            else
+                            {
+                                <span>@reason</span>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @Html.ActionLink("Delete", "Delete", new { id = item.id }, new { @class = "btn btn-danger btn-sm btn-rounded" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
 <script>
     $(document).ready(function () {
+        $("body").on("click", ".toggle-reason", function () {
+            var $this = $(this);
+            var shortReason = $this.siblings(".short-reason");
+            var moreReason = $this.siblings(".more-reason");
 
-        $("#searchButton").click(function () {
-            // Lấy giá trị ID của bài đăng từ input field
-            var postId = $("#postIdInput").val();
-
-            // Gửi yêu cầu AJAX đến controller
-            $.ajax({
-                type: "GET",
-                url: "/Admin/UserReportAdmin/Search?id=" + postId,
-                success: function (response) {
-                    // Xử lý phản hồi từ controller, hiển thị kết quả
-                    // Ví dụ: chuyển hướng đến trang chi tiết bài đăng
-                    window.location.href = "/Admin/UserReportAdmin/Search?id=" + postId;
-                },
-                error: function (error) {
-                    console.error("Error:", error);
-                }
-            });
+            if (shortReason.is(":visible")) {
+                shortReason.hide();
+                moreReason.show();
+                $this.text("ẩn bớt");
+            } else {
+                shortReason.show();
+                moreReason.hide();
+                $this.text("...");
+            }
         });
     });
 </script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
