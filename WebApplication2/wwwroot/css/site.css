@@ -181,18 +181,37 @@ svg.bi-bell-fill {
 
 #commentInput {
     position: fixed;
-    bottom: 20px;
-    left: 20px;
-    width: 850px;*/ /* Đặt độ dài của input là 200px */
+    bottom: 40px;
+    left: 120px; /* Đặt khoảng cách từ bên trái đến input */
+    width: calc(100% - 350px); /* Chiều rộng input và nút Create cộng lại */
+    max-width: 600px;
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
     z-index: 999;
 }
 
 #createCommentButton {
     position: fixed;
-    bottom: 20px;
-    right: 530px; /* Đặt vị trí của button ở góc dưới bên phải */
+    bottom: 40px;
+    padding: 8px 16px;
+    border: 2px solid #FC8717;
+    border-radius: 20px;
+    background-color: #FC8717;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
     z-index: 999;
 }
+
+
+    #createCommentButton:hover {
+        background-color: #f96302;
+        border-color: #f96302;
+    }
+
 /*style.css index*/
 .box {
     position: relative;

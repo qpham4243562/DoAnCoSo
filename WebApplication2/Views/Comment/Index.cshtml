@@ -1,81 +1,94 @@
 ﻿@using System.Security.Claims
 @model IEnumerable<DoAnCoSoAPI.Entities.User_comment>
 <style>
-    .user-profile-custom {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+    /* Comment item style */
+    .comment-item {
         margin-bottom: 20px;
-        margin-left: 100px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
         position: relative;
     }
 
-        .user-profile-custom .send-friend-request,
-        #createCommentButton {
-            border: 2px solid #FC8717;
-            border-radius: 20px;
-            padding: 8px 16px;
-            background-color: transparent;
-            color: #FC8717;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex-shrink: 0; /* Ngăn không cho nút co lại */            
+    .comment-text {
+        font-size: 1.1em;
+        margin-bottom: 5px;
+    }
+
+    .comment-details {
+        font-size: 0.9em;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    /* Delete button style */
+    .delete-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        border: none;
+        background-color: #FC8717;
+        color: #fff;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .delete-btn:hover {
+            background-color: #f96302;
         }
 
-            .user-profile-custom .send-friend-request:hover,
-            #createCommentButton:hover {
-                background-color: #FC8717;
-                color: white;
-            }
-
-    /* Styles for input and button */
-    #commentInput {
-        flex-grow: 1;
-        padding: 8px;
-        margin-right: 5px;
-        box-sizing: border-box;
-        min-width: 0; /* Cho phép co lại khi cần thiết */
-    }
-
-    /* Container for input and button */
+    /* Comment input and create button style */
     .comment-input-container {
         display: flex;
-        align-items: center;
-        width: 100%;
-        max-width: 100%;
-        overflow: hidden;
-        white-space: nowrap; /* Ngăn chặn xuống dòng */
-    }
-    #commentInput, #createCommentButton {
-        min-width: 0; /* Cho phép co lại khi cần thiết */
+        justify-content: center; /* Canh giữa theo chiều ngang */
+        margin-top: 20px;
     }
 
-    #createCommentButton {
-        white-space: nowrap; /* Prevent button text from wrapping */
+    .comment-input {
+        width: calc(100% - 100px);
+        max-width: 300px; /* Giới hạn độ rộng của input */
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.9em;
     }
+
+    .create-comment-button {
+        border: 2px solid #FC8717;
+        border-radius: 20px;
+        padding: 8px 16px;
+        background-color: #FC8717;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .create-comment-button:hover {
+            background-color: #f96302;
+            border-color: #f96302;
+        }
 </style>
+
 <h2>Comments</h2>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 @if (Model != null && Model.Any())
 {
     <ul>
         @foreach (var comment in Model)
         {
-            <li>
-                <div>@comment.comment</div>
-                <div>Created At: @comment.createdAt</div>
-                <div>User Name: @comment.UserName</div>
+            <li class="comment-item">
+                <div class="comment-text">@comment.comment</div>
+                <div class="comment-details">Created At: @comment.createdAt | User Name: @comment.UserName</div>
                 @if (User.Identity.IsAuthenticated && comment.CreatorId == User.FindFirst(ClaimTypes.NameIdentifier)?.Value)
                 {
-                    <form id="deleteCommentForm" method="post" action="/DeleteComment/@ViewBag.PostId/@comment.id">
-                        <div>
-                            <button id="delete-btn" type="submit">Delete</button>
-                        </div>
+                    <form class="delete-comment-form" method="post" action="/DeleteComment/@ViewBag.PostId/@comment.id">
+                        <button class="delete-btn" type="submit">Delete</button>
                     </form>
-
-
-
                 }
             </li>
         }
@@ -85,69 +98,63 @@ else
 {
     <p>No comments found.</p>
 }
+
 <div class="comment-input-container">
-    <input type="text" id="commentInput" placeholder="Type your comment here..." />
-    <button id="createCommentButton">Create</button>
+    <input type="text" class="comment-input" id="commentInput" placeholder="Type your comment here..." />
+    <button class="create-comment-button" id="createCommentButton">Create</button>
 </div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+    // Reload the page every 15 seconds
     setTimeout(function () {
-        location.reload(true); // True để reload từ server, không cache
-    }, 15000); // 15 giây
+        location.reload(true);
+    }, 15000);
 
     $(document).ready(function () {
-        // Xử lý sự kiện khi nhấn Enter trong input
+        // Handle Enter key press in comment input
         $("#commentInput").keypress(function (event) {
-            if (event.which == 13) { // Nếu nhấn phím Enter
-                event.preventDefault(); // Ngăn chặn hành động mặc định của phím Enter
-                addComment(); // Gọi hàm thêm comment
+            if (event.which == 13) {
+                event.preventDefault();
+                addComment();
             }
         });
 
-        // Xử lý sự kiện khi click vào nút "Create"
+        // Handle "Create" button click
         $("#createCommentButton").click(function () {
-            addComment(); // Gọi hàm thêm comment
+            addComment();
         });
 
-        // Hàm thêm comment
+        // Function to add comment via Ajax
         function addComment() {
-            var commentText = $("#commentInput").val(); // Lấy nội dung comment từ input
+            var commentText = $("#commentInput").val();
             $.ajax({
-                url: "/AddComment/@ViewBag.PostId", // Đường dẫn của action xử lý thêm comment (chú ý truyền postId)
+                url: "/AddComment/@ViewBag.PostId",
                 method: "POST",
-                data: { comment: commentText }, // Dữ liệu gửi đi (nội dung comment)
+                data: { comment: commentText },
                 success: function () {
                     window.location.reload();
-                    // Thêm comment thành công, làm gì đó nếu cần
-                    // Ví dụ: Cập nhật danh sách comment mà không cần tải lại trang
                 },
                 error: function () {
-                    // Xử lý lỗi nếu có
+                    alert("Error occurred while adding comment.");
                 }
             });
         }
-        // Xử lý sự kiện khi nhấn nút "Delete"
-        $("#delete-btn").click(function (event) {
-            event.preventDefault(); // Ngăn chặn hành động mặc định của form
 
-            // Lấy action của form
-            var actionUrl = $("#deleteCommentForm").attr("action");
-
-            // Gửi yêu cầu xóa bằng Ajax
+        // Handle delete button click
+        $(".delete-btn").click(function (event) {
+            event.preventDefault();
+            var actionUrl = $(this).closest("form").attr("action");
             $.ajax({
                 type: "POST",
                 url: actionUrl,
                 success: function () {
-                    // Nếu xóa comment thành công, làm gì đó (ví dụ: cập nhật giao diện)
-                    // Sau đó có thể tải lại trang hoặc thực hiện các hành động khác
                     window.location.reload();
                 },
                 error: function () {
-                    // Xử lý lỗi nếu có
-                    alert("Đã xảy ra lỗi khi xóa comment.");
+                    alert("Error occurred while deleting comment.");
                 }
             });
         });
     });
 </script>
-
