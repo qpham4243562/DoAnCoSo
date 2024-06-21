@@ -8,205 +8,150 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" />
 
     <style>
-        .body {
+        body {
             margin: 0;
             line-height: normal;
+            font-family: 'Inter', sans-serif;
         }
 
         .group-child {
             position: absolute;
-            top: 0px;
-            left: 0px;
+            top: 0;
+            left: 0;
             background-color: #fff;
             border: 1.5px solid #fc8717;
             box-sizing: border-box;
-            width: 852px;
-            height: 919.1px;
+            width: 600px;
+            height: 700px;
         }
 
         .tr-chuyn {
             position: absolute;
-            top: 0px;
-            left: 0px;
+            top: 0;
+            left: 0;
             line-height: 150%;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 444.9px;
-            height: 97.4px;
+            width: 100%;
+            height: 60px;
+            font-size: 24px;
+        }
+
+        .vector-icon, .vector-icon2, .vector-icon3, .vector-icon4 {
+            position: absolute;
+            height: 35px;
+            width: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            max-width: 100%;
+            overflow: hidden;
+            max-height: 100%;
+            cursor: pointer;
         }
 
         .vector-icon {
-            position: absolute;
-            height: 43.43%;
-            width: 5.98%;
-            top: 24.63%;
-            right: -0.01%;
-            bottom: 31.94%;
-            left: 94.03%;
-            max-width: 100%;
-            overflow: hidden;
-            max-height: 100%;
-        }
-
-        .vector-icon1 {
-            position: absolute;
-            height: 43.43%;
-            width: 5.98%;
-            top: 24.63%;
-            right: 10.15%;
-            bottom: 31.94%;
-            left: 83.87%;
-            max-width: 100%;
-            overflow: hidden;
-            max-height: 100%;
+            right: 10px;
         }
 
         .vector-icon2 {
-            position: absolute;
-            height: 43.43%;
-            width: 5.98%;
-            top: 27.53%;
-            right: 89.84%;
-            bottom: 29.04%;
-            left: 4.18%;
-            max-width: 100%;
-            overflow: hidden;
-            max-height: 100%;
+            left: 10px;
+        }
+
+        .vector-icon3 {
+            left: 10px;
+            bottom: auto;
+        }
+
+        .vector-icon4 {
+            right: 25px;
+            bottom: auto;
         }
 
         .tr-chuyn-parent {
             position: absolute;
-            top: 0px;
-            left: 0px;
-            width: 821.1px;
-            height: 97.4px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
         }
 
         .group-item {
             position: absolute;
-            height: 10.01%;
             width: 100%;
-            top: 87.83%;
-            right: 0%;
-            bottom: 2.16%;
-            left: 0%;
-            max-width: 100%;          
-            max-height: 100%;
-            margin-top:-20px
+            bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .rectangle-parent {
-            position: absolute;
-            top: 0px;
-            left: 1.07px;
-            width: 848.9px;
-            height: 916px;
+            position: relative;
+            width: 100%;
+            height: 100%;
         }
 
         .group-inner {
             position: absolute;
-            top: 106.79px;
-            left: 0px;
+            top: 60px;
+            left: 0;
             border-top: 1.5px solid rgba(109, 109, 109, 0.6);
             box-sizing: border-box;
-            width: 850.5px;
-            height: 1.5px;
-        }
-
-        .group-wrapper {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            width: 850px;
-            height: 916px;
+            width: 100%;
         }
 
         .rectangle-div {
             position: absolute;
-            top: 104.95px;
-            left: 0px;
+            top: 60px;
+            left: 0;
             background-color: #e8dddd;
-            width: 849.3px;
-            height: 703.3px;
+            width: 100%;
+            height: calc(100% - 120px);
+            overflow-y: auto;
         }
 
         .group-parent {
-            width: 100%;
-            position: relative;
+            width: 600px;
             height: 700px;
+            margin: 0 auto;
             text-align: center;
-            font-size: 36.8px;
             color: #fc8717;
-            font-family: Inter;
-        }
-
-        .vector-icon3 {
-            position: absolute;
-            height: 43.43%;
-            width: 5.98%;
-            top: 60%;
-            right: 89.84%;
-            bottom: 29.04%;
-            left: 4%;
-            max-width: 100%;
-            overflow: hidden;
-            max-height: 100%;
-        }
-        .vector-icon4 {
-            position: absolute;
-            height: 43.43%;
-            width: 5.98%;
-            top: 60%;
-            right: 89.84%;
-            bottom: 29.04%;
-            left: 89%;
-            max-width: 100%;
-            overflow: hidden;
-            max-height: 100%;
+            font-family: 'Inter', sans-serif;
+            position: relative;
         }
 
         #discussion {
             font-size: 14px;
             color: black;
-            overflow: auto; /* Thêm thanh cuộn khi nội dung vượt quá kích thước của phần tử */
-            max-height: 650px; /* Đặt chiều cao tối đa để kích thước phần tử không vượt quá */
+            overflow-y: auto;
+            max-height: 540px;
+            margin: 0;
+            padding: 10px;
+            list-style: none;
         }
 
             #discussion li {
-                margin-left: 0; /* Xóa lề trái mặc định */
-                padding-left: 10px; /* Đặt lề trái mới */
+                padding: 5px 0;
             }
+
+        #message {
+            width: 70%;
+            padding: 5px;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="group-parent">
-        <div class="group-wrapper">
-            <div class="group-wrapper">
-                <div class="group-wrapper">
-                    <div class="rectangle-parent">
-                        <div class="group-child"></div>
-                        <div class="tr-chuyn-parent">
-                            <b class="tr-chuyn">Trò Chuyện</b>                         
-                            <img class="vector-icon" src="~/images/Vector.svg" onclick="window.location.href = 'https://localhost:7222/UserPost/Index';">                     
-                            <img class="vector-icon2" alt="" src="~/images/Vector (2).svg">
-                        </div>
-                        <div class="container group-item">
-                            <div class="mt-5">
-                                <img class="vector-icon3" alt="" src="~/images/Vector (3).svg">
-                                <input type="text" id="message" />
-                                <img id="sendmessage" class="send-message-btn vector-icon4" alt="" src="~/images/Vector (4).svg">
-                               
-                            </div>
-                           
-                        </div>
-                    </div>
-                    <div class="group-inner"></div>
-                </div>
+        <div class="rectangle-parent">
+            <div class="group-child"></div>
+            <div class="tr-chuyn-parent">
+                <b class="tr-chuyn">Trò Chuyện</b>
+                <img class="vector-icon" src="~/images/Vector.svg" onclick="window.location.href = 'https://localhost:7222/UserPost/Index';">
+                <img class="vector-icon2" src="~/images/Vector (2).svg">
             </div>
-        </div>
-        <div class="rectangle-div">
-            <div class="mt-3">
+            <div class="group-inner"></div>
+            <div class="rectangle-div">
                 <ul id="discussion">
                     @foreach (var message in Model)
                     {
@@ -214,14 +159,16 @@
                     }
                 </ul>
             </div>
+            <div class="group-item">
+                <img class="vector-icon3" src="~/images/Vector (3).svg">
+                <input type="text" id="message" />
+                <img id="sendmessage" class="vector-icon4" src="~/images/Vector (4).svg">
+            </div>
         </div>
     </div>
 
-    
-
     <script src="https://cdn.jsdelivr.net/npm/@@microsoft/signalr@5.0.8/dist/browser/signalr.min.js"></script>
     <script>
-
         var connection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
 
         connection.start().catch(function (err) {

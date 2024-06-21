@@ -73,9 +73,9 @@
                     <td>
                         @{
                             var content = item.content;
-                            if (content.Length > 20)
+                            if (content.Length > 50)
                             {
-                                <span class="short-content">@content.Substring(0, 20)</span>
+                                <span class="short-content">@content.Substring(0, 50)</span>
                                 <span class="more-content" style="display:none">@content</span>
                                 <a href="javascript:void(0);" class="toggle-content">...</a>
                             }
