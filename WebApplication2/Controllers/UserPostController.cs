@@ -98,6 +98,9 @@ namespace WebApplication2.Controllers
                 return BadRequest("User ID not found in cookie");
             }
 
+            // Logging userId
+            Console.WriteLine($"User ID: {userId}");
+
             // Code khác đã có ở phần mã của bạn
 
             // Tạo thông báo
@@ -184,11 +187,28 @@ namespace WebApplication2.Controllers
             // Add information about the creator
             var creatorId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             user_Post.CreatorId = creatorId;
+
+            // Logging creatorId
+            Console.WriteLine($"Creator ID: {creatorId}");
+
             var creator = await _userCollection.Find(u => u.Id == creatorId).FirstOrDefaultAsync();
             if (creator != null)
             {
+                // Logging to confirm creator data retrieval
+                Console.WriteLine($"Creator found: {creator.lastName} {creator.firstName}");
+
                 user_Post.CreatorName = $"{creator.lastName} {creator.firstName}";
-                user_Post.CreatorAvatar = creator.images; // Assuming 'Avatar' is the property storing the user's avatar image
+                user_Post.CreatorAvatar = creator.images; // Assuming 'images' is the property storing the user's avatar image
+
+                // Logging to confirm image data
+                if (creator.images != null)
+                {
+                    Console.WriteLine($"Creator image size: {creator.images.Length}");
+                }
+                else
+                {
+                    Console.WriteLine("Creator image is null");
+                }
             }
             else
             {
@@ -207,6 +227,7 @@ namespace WebApplication2.Controllers
 
             return RedirectToAction("Index", "UserPost");
         }
+
 
 
         [HttpGet]

@@ -61,7 +61,7 @@ namespace WebApplication2.Controllers
             user.role = "user";
             user.RegisterAt = DateTime.UtcNow;
             user.PasswordHash = HashPassword(user.PasswordHash);
-            user.images = new byte[0];
+            user.images = null;
             await _userCollection.InsertOneAsync(user);
             return Redirect("/user/Login");
         }
